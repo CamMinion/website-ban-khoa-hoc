@@ -13,6 +13,7 @@ Business Analyst (primary) | Backend Developer
 - Learning progress tracking
 - Automated certification
 - Content-based course recommendation
-- 
+  
 ## Documentation
 - Content-Based Recommendation Design: `docs/Content-Based-Course-Recommendation.pdf`
+
