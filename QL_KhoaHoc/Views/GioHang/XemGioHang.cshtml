@@ -1,0 +1,241 @@
+﻿@model QL_KhoaHoc.Models.GioHangViewModel
+@{
+    ViewData["Title"] = "Giỏ hàng của tôi";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 fw-bold">🛒 Giỏ hàng của bạn</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model == null || !Model.Items.Any())
+    {
+        <div class="alert alert-info">
+            Giỏ hàng của bạn đang trống. Hãy quay lại <a href="/KhoaHoc" class="alert-link">trang khóa học</a> để mua sắm nhé!
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.Items)
+                            {
+                                <li class="list-group-item p-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2">
+                                            <img src="@item.AnhBia" alt="@item.TenKhoaHoc" class="img-fluid rounded" />
+                                        </div>
+                                        <div class="col-md-5">
+                                            <h6 class="fw-semibold mb-0">@item.TenKhoaHoc</h6>
+                                            <small class="text-muted">Mã KH: @item.MaKH</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            @if (item.TienGiam > 0)
+                                            {
+                                                // TRƯỜNG HỢP CÓ GIẢM GIÁ
+
+                                                // 1. Giá gốc bị gạch ngang
+                                                <div class="text-muted text-decoration-line-through small">@item.DonGia.ToString("#,##0") đ</div>
+
+                                                // 2. Giá sau khi giảm (Màu đỏ đậm)
+                                                <span class="fw-bold text-danger fs-5">
+                                                    @((item.DonGia - item.TienGiam).ToString("#,##0")) đ
+                                                </span>
+
+                                                // 3. Badge hiển thị số tiền/phần trăm giảm
+                                                <div class="mt-1">
+                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                        <i class="bi bi-arrow-down"></i> Giảm @item.TienGiam.ToString("#,##0") đ
+                                                    </span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                // KHÔNG CÓ GIẢM GIÁ -> HIỆN NHƯ CŨ
+                                                <span class="fw-bold text-danger fs-5">@item.DonGia.ToString("#,##0") đ</span>
+                                            }
+                                        </div>
+                                        <div class="col-md-2 text-end">
+                                            <form asp-action="XoaKhoiGioHang" asp-controller="GioHang" method="post">
+                                                <input type="hidden" name="maKH" value="@item.MaKH" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa khóa học này?');">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Tổng cộng</h5>
+                        <hr />
+
+                        <form asp-action="ApplyDiscount" asp-controller="GioHang" method="post" class="mb-3" id="formApplyCode">
+                            <label class="form-label">Mã giảm giá</label>
+                            <div class="input-group">
+                                <input type="text" name="maCode" id="inputMaCode" class="form-control" placeholder="Nhập mã..."
+                                       value="@(Model.AppliedDiscount?.MACODE)"
+                                @(Model.AppliedDiscount != null ? "readonly" : "") />
+                                <button type="submit" class="btn btn-primary"
+                                @(Model.AppliedDiscount != null ? "disabled" : "")>
+                                    Áp dụng
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="card bg-light border-0 mt-3 p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span><i class="bi bi-coin text-warning"></i> Điểm T&C: <b>@Model.UserPoints</b></span>
+                                <small class="text-muted">(1 điểm = 1.000đ)</small>
+                            </div>
+
+                            @if (Model.PointsToUse > 0)
+                            {
+                                <div class="d-flex justify-content-between align-items-center text-success">
+                                    <span>Đang dùng <b>@Model.PointsToUse</b> điểm</span>
+                                    <form asp-action="RemovePoints" asp-controller="GioHang" method="post">
+                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0">[Hủy]</button>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <form asp-action="ApplyPoints" asp-controller="GioHang" method="post" class="d-flex gap-2">
+                                    <input type="number" name="points" class="form-control form-control-sm"
+                                           placeholder="Nhập số điểm" max="@Model.UserPoints" min="0">
+                                    <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold">Dùng</button>
+                                </form>
+                            }
+                        </div>
+
+                        @if (Model.PointDiscountAmount > 0)
+                        {
+                            <div class="d-flex justify-content-between mb-2 text-warning">
+                                <span>Tiêu điểm tích lũy:</span>
+                                <span class="fw-semibold">- @Model.PointDiscountAmount.ToString("#,##0") đ</span>
+                            </div>
+                        }
+
+                        @if (Model.AvailableDiscounts != null && Model.AvailableDiscounts.Any())
+                        {
+                            <div class="mt-3">
+                                <h6 class="text-muted small mb-2"><i class="bi bi-tags-fill"></i> Mã ưu đãi có thể dùng:</h6>
+
+                                <div class="list-group shadow-sm" style="max-height: 250px; overflow-y: auto;">
+                                    @foreach (var coupon in Model.AvailableDiscounts)
+                                    {
+                                        // Logic kiểm tra hiệu lực
+                                        bool isExpired = coupon.NGAYKETTHUC < DateTime.Now;
+                                        bool isOutOfStock = coupon.SOLANSUDUNG.HasValue && coupon.SOLANSUDUNG <= 0;
+                                        bool isValid = !isExpired && !isOutOfStock;
+
+                                        <div class="list-group-item list-group-item-action @(isValid ? "" : "bg-light text-muted")">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div style="width: 70%">
+                                                    <div class="fw-bold @(isValid ? "text-primary" : "")">
+                                                        @coupon.MACODE
+                                                        @if (Model.AppliedDiscount?.MACODE == coupon.MACODE)
+                                                        {
+                                                            <span class="badge bg-success ms-1" style="font-size: 0.6em">Đang dùng</span>
+                                                        }
+                                                    </div>
+
+                                                    <div class="small text-truncate">@coupon.MOTA</div>
+
+                                                    <div class="small fst-italic" style="font-size: 0.75rem;">
+                                                        @if (isExpired)
+                                                        {
+                                                            <span class="text-danger">Đã hết hạn</span>
+                                                        }
+                                                        else if (isOutOfStock)
+                                                        {
+                                                            <span class="text-danger">Đã hết lượt</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>HSD: @coupon.NGAYKETTHUC.ToString("dd/MM/yyyy")</span>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    @if (isValid && Model.AppliedDiscount?.MACODE != coupon.MACODE)
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                                onclick="chonMaGiamGia('@coupon.MACODE')">
+                                                            Dùng
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <div class="d-flex justify-content-between mb-2 mt-3">
+                            <span>Thành tiền:</span>
+                            <span class="fw-semibold">@Model.Subtotal đ</span>
+                        </div>
+
+                        @if (Model.AppliedDiscount != null)
+                        {
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>
+                                    Giảm giá (@Model.AppliedDiscount.MACODE)
+                                    <form asp-action="RemoveDiscount" asp-controller="GioHang" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-link btn-sm text-danger p-0">
+                                            [Xóa]
+                                        </button>
+                                    </form>
+                                </span>
+                                <span class="fw-semibold">- @Model.DiscountAmount đ</span>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fs-5 fw-bold">Tổng thanh toán:</span>
+                            <span class="fs-4 fw-bold text-danger">@Model.TotalPayable đ</span>
+                        </div>
+
+                        <form asp-action="TienHanhThanhToan" asp-controller="GioHang" method="post">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                Tiến hành thanh toán
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    function chonMaGiamGia(code) {
+        // 1. Điền code vào ô input
+        document.getElementById('inputMaCode').value = code;
+        // 2. Submit form
+        document.getElementById('formApplyCode').submit();
+    }
+</script>

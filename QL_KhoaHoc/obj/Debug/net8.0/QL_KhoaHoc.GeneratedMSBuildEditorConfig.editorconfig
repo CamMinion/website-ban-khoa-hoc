@@ -1,0 +1,153 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = QL_KhoaHoc
+build_property.RootNamespace = QL_KhoaHoc
+build_property.ProjectDir = D:\KhoaLuan\Code\QL_KhoaHoc\QL_KhoaHoc\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\KhoaLuan\Code\QL_KhoaHoc\QL_KhoaHoc
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Account/ChonSoThich.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxDaG9uU29UaGljaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Account/MyCertificates.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxNeUNlcnRpZmljYXRlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Account/VerifyOTP.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxWZXJpZnlPVFAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GiangVien/DangKyGiangVien.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lhbmdWaWVuXERhbmdLeUdpYW5nVmllbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GiangVien/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lhbmdWaWVuXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GiangVien/Info.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lhbmdWaWVuXEluZm8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GiangVien/ThietLapHoSo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lhbmdWaWVuXFRoaWV0TGFwSG9Tby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GiangVien/ThuNhap.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lhbmdWaWVuXFRodU5oYXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GioHang/ThanhToanThanhCong.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lvSGFuZ1xUaGFuaFRvYW5UaGFuaENvbmcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GioHang/TrangThanhToan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lvSGFuZ1xUcmFuZ1RoYW5oVG9hbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/GioHang/XemGioHang.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2lvSGFuZ1xYZW1HaW9IYW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/HocVien/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9jVmllblxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/ChitietKH.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xDaGl0aWV0S0guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/DanhSachKH.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xEYW5oU2FjaEtILmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/Hoc.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xIb2MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/MyCourses.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xNeUNvdXJzZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/QuanLyBanNhap.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xRdWFuTHlCYW5OaGFwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xTZWFyY2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/KhoaHoc/TaoKhoaHoc.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2hvYUhvY1xUYW9LaG9hSG9jLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Shared/Components/CartBadge/Default.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcQ2FydEJhZGdlXERlZmF1bHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Shared/Components/CategoryMenu/Default.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcQ2F0ZWdvcnlNZW51XERlZmF1bHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Shared/_GiangVien_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9HaWFuZ1ZpZW5fTGF5b3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/KhoaLuan/Code/QL_KhoaHoc/QL_KhoaHoc/Views/Shared/_HocVien_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Ib2NWaWVuX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = b-r4dzqdslor

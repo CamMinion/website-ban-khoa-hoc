@@ -1,0 +1,930 @@
+﻿@model QL_KhoaHoc.Models.KhoaHocCreateModel
+@{
+    ViewData["Title"] = Model.MaKhoaHoc > 0 ? "Chỉnh Sửa Khóa Học" : "Tạo Khóa Học Mới";
+    Layout = "~/Views/Shared/_GiangVien_Layout.cshtml";
+    var danhMucConList = ViewBag.DanhMucConList as List<QL_KhoaHoc.Models.DanhMucCon>;
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+        <i class="fas fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+        <i class="fas fa-exclamation-circle mr-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Hiệu ứng xoay icon collapse */
+        .collapse-icon {
+            transition: transform 0.3s ease;
+        }
+
+            .collapse-icon.collapsed {
+                transform: rotate(-90deg);
+            }
+
+        /* MÀU SẮC PHÂN BIỆT CÁC LOẠI ITEM */
+        .bai-giang .card-header {
+            background-color: #e6f7ff;
+            border-left: 5px solid #007bff; /* Xanh dương */
+        }
+
+        .trac-nghiem .card-header {
+            background-color: #fffbe6;
+            border-left: 5px solid #ffc107; /* Vàng */
+        }
+
+        .bai-tap .card-header {
+            background-color: #e6ffe6;
+            border-left: 5px solid #28a745; /* Xanh lá */
+        }
+
+        .chuong-muc > .card-header {
+            background-color: #f0f0f0;
+            border-bottom: 2px solid #ccc;
+            cursor: move;
+        }
+
+        .section-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .wizard-step {
+            display: none;
+        }
+
+            .wizard-step.active {
+                display: block;
+            }
+
+        /* CSS cho vùng kéo thả */
+        .sortable-container .card-header {
+            cursor: move;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #cdf;
+        }
+
+        /* Container chứa nội dung hỗn hợp */
+        .chapter-content-container {
+            min-height: 60px;
+            border: 2px dashed #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+        <form asp-action="TaoKhoaHoc" method="post" class="card p-4" id="create-course-form" enctype="multipart/form-data">
+            <input type="hidden" asp-for="MaKhoaHoc" />
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div id="step-1" class="wizard-step active">
+                <h4 class="section-header">Bước 1: Thông tin cơ bản</h4>
+                <div class="form-group">
+                    <label asp-for="TenKhoaHoc">Tên Khóa Học</label>
+                    <input asp-for="TenKhoaHoc" class="form-control" required />
+                    <span asp-validation-for="TenKhoaHoc" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MaDanhMuc">Thể loại (Danh mục con)</label>
+                    <select asp-for="MaDanhMuc" class="form-control" required>
+                        <option value="">-- Chọn thể loại --</option>
+                        @if (danhMucConList != null)
+                        {
+                            foreach (var item in danhMucConList)
+                            {
+                                <option value="@item.MaDanhMucCon">@item.TenDanhMucCon</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="MaDanhMuc" class="text-danger"></span>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="goToStep(2)">Tiếp tục</button>
+            </div>
+
+            <div id="step-2" class="wizard-step">
+                <h4 class="section-header">Bước 2: Xây dựng khóa học</h4>
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" id="plan-tab" data-toggle="tab" href="#plan" role="tab">Lập kế hoạch</a></li>
+                    <li class="nav-item"><a class="nav-link" id="curriculum-tab" data-toggle="tab" href="#curriculum" role="tab">Khung chương trình</a></li>
+                    <li class="nav-item"><a class="nav-link" id="publish-tab" data-toggle="tab" href="#publish" role="tab">Xuất bản</a></li>
+                </ul>
+
+                <div class="tab-content py-3" id="myTabContent">
+
+                    <div class="tab-pane fade show active" id="plan" role="tabpanel">
+                        <div class="form-group"><label asp-for="MucTieu">Mục Tiêu</label><textarea asp-for="MucTieu" class="form-control" rows="3"></textarea></div>
+                        <div class="form-group"><label asp-for="DoiTuong">Đối Tượng</label><textarea asp-for="DoiTuong" class="form-control" rows="3"></textarea></div>
+                        <div class="form-group"><label asp-for="YeuCau">Yêu Cầu</label><textarea asp-for="YeuCau" class="form-control" rows="3"></textarea></div>
+                        <div class="form-group"><label asp-for="MoTaNgan">Mô Tả Ngắn</label><textarea asp-for="MoTaNgan" class="form-control" rows="3"></textarea></div>
+                    </div>
+
+                    <div class="tab-pane fade" id="curriculum" role="tabpanel">
+                        <div id="chuong-mucs" class="mb-4 sortable-container">
+                            <h5 class="text-muted">Danh sách các chương (Kéo thả để sắp xếp)</h5>
+
+                            @if (Model.ChuongMucs != null && Model.ChuongMucs.Any())
+                            {
+                                <script>chuongMucIndex = @Model.ChuongMucs.Count;</script>
+
+                                @for (int cmIndex = 0; cmIndex < Model.ChuongMucs.Count; cmIndex++)
+                                {
+                                    var chuong = Model.ChuongMucs[cmIndex];
+                                    var collapseCmId = $"collapseCm-{cmIndex}";
+
+                                    <div class="card mb-3 chuong-muc" data-index="@cmIndex">
+                                        <div class="card-header">
+                                            <strong class="chuong-muc-title">Chương @(cmIndex + 1): @(chuong.TenChuong ?? "(Chưa đặt tên)")</strong>
+                                            <div class="float-right">
+                                                <button type="button" class="btn btn-danger btn-sm mr-2" onclick="$(this).closest('.chuong-muc').remove(); updateAllIndices()">Xóa Chương</button>
+                                                <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#@collapseCmId"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="collapse show" id="@collapseCmId">
+                                            <div class="card-body bg-light">
+                                                <div class="form-group">
+                                                    <label>Tên Chương</label>
+                                                    <input name="ChuongMucs[@cmIndex].TenChuong" class="form-control font-weight-bold" required value="@chuong.TenChuong" onkeyup="$(this).closest('.chuong-muc').find('.chuong-muc-title').text('Chương @(cmIndex + 1): ' + (this.value || '(Mới)'))" />
+                                                </div>
+                                                <input type="hidden" name="ChuongMucs[@cmIndex].ThuTu" class="chuongmuc-thutu-input" value="@cmIndex" />
+                                                <input type="hidden" name="ChuongMucs[@cmIndex].MaCM" value="@chuong.MaCM" />
+
+                                                <h6 class="mt-3 text-primary">Nội dung trong chương (Kéo thả để trộn thứ tự)</h6>
+
+                                                <div id="content-container-@cmIndex" class="chapter-content-container sortable-container mb-3">
+                                                    @{
+                                                        // LOGIC C#: Gộp 3 list và sắp xếp theo ThuTu
+                                                        var sortedItems = new List<dynamic>();
+                                                        if (chuong.BaiGiangs != null) sortedItems.AddRange(chuong.BaiGiangs.Select((x, i) => new { Type = "BG", Data = x, Index = i, Order = x.ThuTu }));
+                                                        if (chuong.TracNghiems != null) sortedItems.AddRange(chuong.TracNghiems.Select((x, i) => new { Type = "TN", Data = x, Index = i, Order = x.ThuTu }));
+                                                        if (chuong.BaiTaps != null) sortedItems.AddRange(chuong.BaiTaps.Select((x, i) => new { Type = "BT", Data = x, Index = i, Order = x.ThuTu }));
+
+                                                        sortedItems = sortedItems.OrderBy(x => x.Order).ToList();
+
+                                                        // Khởi tạo biến đếm JS cho từng chương
+                                                        <script>
+                                                            baiGiangIndices[@cmIndex] = @(chuong.BaiGiangs?.Count ?? 0);
+                                                            tracNghiemIndices[@cmIndex] = @(chuong.TracNghiems?.Count ?? 0);
+                                                            baiTapIndices[@cmIndex] = @(chuong.BaiTaps?.Count ?? 0);
+                                                        </script>
+                                                    }
+
+                                                    @foreach (var item in sortedItems)
+                                                    {
+                                                        // RENDER BÀI GIẢNG
+                                                        if (item.Type == "BG")
+                                                        {
+                                                            var bg = item.Data as QL_KhoaHoc.Models.BaiGiangCreateModel;
+                                                            var bgIndex = item.Index;
+                                                            var collapseBgId = $"bg-collapse-{cmIndex}-{bgIndex}-{Guid.NewGuid()}";
+
+                                                            <div class="card mb-2 bai-giang content-item" data-type="bg">
+                                                                <div class="card-header p-2">
+                                                                    <strong class="bg-title"><i class="fas fa-video mr-2"></i>Bài Giảng: @(bg.Video != null ? System.IO.Path.GetFileName(bg.Video) : bg.BaiViet?.Substring(0, Math.Min(bg.BaiViet?.Length ?? 0, 30)) + "..." ?? "(Mới)")</strong>
+                                                                    <div class="float-right">
+                                                                        <button type="button" class="btn btn-success btn-sm mr-1" onclick="saveDraftOnly()">Lưu</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm mr-1" onclick="$(this).closest('.bai-giang').remove(); updateAllIndices()">Xóa</button>
+                                                                        <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#@collapseBgId"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="collapse show" id="@collapseBgId">
+                                                                    <div class="card-body">
+                                                                        <div class="form-group">
+                                                                            <label>Video (URL: @(bg.Video ?? "Chưa có"))</label>
+                                                                            <input type="file" name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].VideoFile" class="form-control" accept="video/*" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Tài liệu đính kèm (PDF, Word...) - Hiện tại: @(bg.FileTaiXuong != null ? "Đã có" : "Chưa có")</label>
+                                                                            <input type="file" name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].TaiLieuFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar" />
+
+                                                                            <input type="hidden" name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].FileTaiXuong" value="@bg.FileTaiXuong" />
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Bài Viết</label>
+                                                                            <textarea name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].BaiViet" class="form-control" rows="2">@bg.BaiViet</textarea>
+                                                                        </div>
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].ThuTu" class="item-thutu-input" value="@item.Order" />
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].Video" value="@bg.Video" />
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].BaiGiangs[@bgIndex].MaBG" value="@bg.MaBG" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        // RENDER TRẮC NGHIỆM
+                                                        else if (item.Type == "TN")
+                                                        {
+                                                            var tn = item.Data as QL_KhoaHoc.Models.TracNghiemCreateModel;
+                                                            var tnIndex = item.Index;
+                                                            var collapseTnId = $"tn-collapse-{cmIndex}-{tnIndex}-{Guid.NewGuid()}";
+
+                                                            <div class="card mb-2 trac-nghiem content-item" data-type="tn">
+                                                                <div class="card-header p-2">
+                                                                    <strong class="tn-title"><i class="fas fa-question-circle mr-2"></i>Trắc Nghiệm: @(tn.TieuDe ?? "(Mới)")</strong>
+                                                                    <div class="float-right">
+                                                                        <button type="button" class="btn btn-success btn-sm mr-1" onclick="saveDraftOnly()">Lưu</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm mr-1" onclick="$(this).closest('.trac-nghiem').remove(); updateAllIndices()">Xóa</button>
+                                                                        <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#@collapseTnId"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="collapse show" id="@collapseTnId">
+                                                                    <div class="card-body">
+                                                                        <div class="form-group">
+                                                                            <label>Tiêu Đề</label>
+                                                                            <input name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].TieuDe" class="form-control" value="@tn.TieuDe" onkeyup="$(this).closest('.trac-nghiem').find('.tn-title').text('Trắc Nghiệm: ' + (this.value || '(Mới)'))" />
+                                                                        </div>
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].ThuTu" class="item-thutu-input" value="@item.Order" />
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].MaTN" value="@tn.MaTN" />
+
+                                                                        <div class="cau-hois mb-3 sortable-container p-2 bg-white border rounded">
+                                                                            <h6 class="text-muted font-italic">Danh sách câu hỏi</h6>
+                                                                            @if (tn.CauHois != null && tn.CauHois.Any())
+                                                                            {
+                                                                                <script>cauHoiTNIndices['@cmIndex-@tnIndex'] = @tn.CauHois.Count;</script>
+                                                                                @for (int chIndex = 0; chIndex < tn.CauHois.Count; chIndex++)
+                                                                                {
+                                                                                    var ch = tn.CauHois[chIndex];
+                                                                                    var colCH = $"chtn-{cmIndex}-{tnIndex}-{chIndex}";
+                                                                                    <div class="card mb-2 cau-hoi-tn">
+                                                                                        <div class="card-header p-1 bg-light">
+                                                                                            <span class="chtn-title">Câu Hỏi @(chIndex + 1)</span>
+                                                                                            <div class="float-right">
+                                                                                                <button type="button" class="btn btn-danger btn-sm py-0" onclick="$(this).closest('.cau-hoi-tn').remove(); updateAllIndices()">Xóa</button>
+                                                                                                <a class="btn btn-sm btn-link py-0" data-toggle="collapse" href="#@colCH"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="collapse show" id="@colCH">
+                                                                                            <div class="card-body p-2">
+                                                                                                <textarea name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].CauHois[@chIndex].NoiDung" class="form-control mb-2" rows="2" placeholder="Nội dung câu hỏi...">@ch.NoiDung</textarea>
+                                                                                                <input type="hidden" name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].CauHois[@chIndex].MaCH" value="@ch.MaCH" />
+                                                                                                <div class="dap-ans sortable-container pl-3 border-left">
+                                                                                                    @if (ch.DapAns != null)
+                                                                                                    {
+                                                                                                        <script>dapAnIndices['@cmIndex-@tnIndex-@chIndex'] = @ch.DapAns.Count;</script>
+                                                                                                        @for (int daIndex = 0; daIndex < ch.DapAns.Count; daIndex++)
+                                                                                                        {
+                                                                                                            var da = ch.DapAns[daIndex];
+                                                                                                            <div class="card mb-1 dap-an">
+                                                                                                                <div class="card-body p-2">
+                                                                                                                    <div class="d-flex align-items-center mb-2">
+                                                                                                                        <input type="checkbox" name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].CauHois[@chIndex].DapAns[@daIndex].KetQua" value="true" @(da.KetQua ? "checked" : "") class="mr-2" title="Là đáp án đúng" style="transform: scale(1.2);" />
+                                                                                                                        <input name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].CauHois[@chIndex].DapAns[@daIndex].NoiDung" value="@da.NoiDung" class="form-control mr-2" placeholder="Nội dung đáp án..." />
+                                                                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].CauHois[@chIndex].DapAns[@daIndex].MaDA" value="@da.MaDA" />
+                                                                                                                        <button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('.dap-an').remove(); updateAllIndices()"><i class="fas fa-times"></i></button>
+                                                                                                                    </div>
+                                                                                                                    <textarea name="ChuongMucs[@cmIndex].TracNghiems[@tnIndex].CauHois[@chIndex].DapAns[@daIndex].GiaiThich" class="form-control form-control-sm bg-light" rows="1" placeholder="Giải thích (tùy chọn)...">@da.GiaiThich</textarea>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        }
+                                                                                                    }
+                                                                                                </div>
+                                                                                                <button type="button" class="btn btn-link btn-sm pl-0" onclick="addDapAn(@cmIndex, @tnIndex, @chIndex)">+ Thêm Đáp Án</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                }
+                                                                            }
+                                                                        </div>
+                                                                        <button type="button" class="btn btn-info btn-sm" onclick="addCauHoiTN(@cmIndex, @tnIndex)">Thêm Câu Hỏi</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        // RENDER BÀI TẬP
+                                                        else if (item.Type == "BT")
+                                                        {
+                                                            var bt = item.Data as QL_KhoaHoc.Models.BaiTapCreateModel;
+                                                            var btIndex = item.Index;
+                                                            var collapseBtId = $"bt-collapse-{cmIndex}-{btIndex}-{Guid.NewGuid()}";
+
+                                                            <div class="card mb-2 bai-tap content-item" data-type="bt">
+                                                                <div class="card-header p-2">
+                                                                    <strong class="bt-title"><i class="fas fa-file-alt mr-2"></i>Bài Tập: @(bt.TieuDe ?? "(Mới)")</strong>
+                                                                    <div class="float-right">
+                                                                        <button type="button" class="btn btn-success btn-sm mr-1" onclick="saveDraftOnly()">Lưu</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm mr-1" onclick="$(this).closest('.bai-tap').remove(); updateAllIndices()">Xóa</button>
+                                                                        <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#@collapseBtId"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="collapse show" id="@collapseBtId">
+                                                                    <div class="card-body">
+                                                                        <div class="form-group">
+                                                                            <label>Tiêu Đề</label>
+                                                                            <input name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].TieuDe" class="form-control" value="@bt.TieuDe" onkeyup="$(this).closest('.bai-tap').find('.bt-title').text('Bài Tập: ' + (this.value || '(Mới)'))" />
+                                                                        </div>
+
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-group">
+                                                                                    <label>Thời lượng (phút)</label>
+                                                                                    <input type="number" name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].ThoiLuong" class="form-control" value="@bt.ThoiLuong" placeholder="VD: 15" />
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-8">
+                                                                                <div class="form-group">
+                                                                                    <label>File Hướng dẫn (nếu có)</label>
+                                                                                    <input type="file" name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].HuongDanFile" class="form-control" accept=".pdf,.doc,.docx,.png,.jpg" />
+                                                                                    <input type="hidden" name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].HuongDan" value="@bt.HuongDan" />
+                                                                                    @if (!string.IsNullOrEmpty(bt.HuongDan) && bt.HuongDan.StartsWith("http"))
+                                                                                    {
+                                                                                        <small class="text-success"><i class="fas fa-link"></i> Đang có file: <a href="@bt.HuongDan" target="_blank">Xem file</a></small>
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group">
+                                                                            <label>Hoặc Nhập Hướng dẫn (Văn bản)</label>
+                                                                            <textarea name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].HuongDan" class="form-control" rows="3" placeholder="Nhập hướng dẫn làm bài...">@bt.HuongDan</textarea>
+                                                                            <small class="text-muted">* Nếu bạn upload file, link file sẽ được lưu đè vào ô này.</small>
+                                                                        </div>
+
+
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].ThuTu" class="item-thutu-input" value="@item.Order" />
+                                                                        <input type="hidden" name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].MaBT" value="@bt.MaBT" />
+
+                                                                        <div class="cau-hois-bt mb-3 sortable-container p-2 bg-white border rounded">
+                                                                            <h6 class="text-muted font-italic">Câu hỏi bài tập</h6>
+                                                                            @if (bt.CauHois != null && bt.CauHois.Any())
+                                                                            {
+                                                                                <script>cauHoiBTIndices['@cmIndex-@btIndex'] = @bt.CauHois.Count;</script>
+                                                                                @for (int chIndex = 0; chIndex < bt.CauHois.Count; chIndex++)
+                                                                                {
+                                                                                    var ch = bt.CauHois[chIndex];
+                                                                                    <div class="card mb-2 cau-hoi-bt">
+                                                                                        <div class="card-body p-2">
+                                                                                            <div class="form-group mb-1">
+                                                                                                <textarea name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].CauHois[@chIndex].NoiDung" class="form-control" rows="2" placeholder="Nội dung...">@ch.NoiDung</textarea>
+                                                                                            </div>
+                                                                                            <div class="form-group mb-1">
+                                                                                                <textarea name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].CauHois[@chIndex].DapAnMau" class="form-control" rows="1" placeholder="Đáp án mẫu...">@ch.DapAnMau</textarea>
+                                                                                            </div>
+                                                                                            <input type="hidden" name="ChuongMucs[@cmIndex].BaiTaps[@btIndex].CauHois[@chIndex].MaCauHoi" value="@ch.MaCauHoi" />
+                                                                                            <button type="button" class="btn btn-danger btn-sm mt-1" onclick="$(this).closest('.cau-hoi-bt').remove(); updateAllIndices()">Xóa Câu Hỏi</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                }
+                                                                            }
+                                                                        </div>
+                                                                        <button type="button" class="btn btn-info btn-sm" onclick="addCauHoiBT(@cmIndex, @btIndex)">Thêm Câu Hỏi BT</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                                <div class="btn-group w-100">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="addBaiGiang(@cmIndex)"><i class="fas fa-plus"></i> Bài Giảng</button>
+                                                    <button type="button" class="btn btn-outline-warning" onclick="addTracNghiem(@cmIndex)"><i class="fas fa-plus"></i> Trắc Nghiệm</button>
+                                                    <button type="button" class="btn btn-outline-success" onclick="addBaiTap(@cmIndex)"><i class="fas fa-plus"></i> Bài Tập</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" class="btn btn-primary add-btn btn-block" onclick="addChuongMuc()"><i class="fas fa-folder-plus"></i> Thêm Chương Mục Mới</button>
+                    </div>
+
+                    @* <div class="tab-pane fade" id="publish" role="tabpanel"> *@
+                    @*     <div class="form-group"><label asp-for="GiaTien">Giá Tiền</label><input asp-for="GiaTien" class="form-control" type="number" step="0.01" required /></div> *@
+                    @*     <div class="form-group"><label asp-for="AnhBia">Ảnh Bìa (URL)</label><input asp-for="AnhBia" class="form-control" /></div> *@
+                    @*     <div class="form-group"><label asp-for="TinNhanChaoMung">Tin Nhắn Chào Mừng</label><textarea asp-for="TinNhanChaoMung" class="form-control" rows="3"></textarea></div> *@
+                    @* </div> *@
+                    <div class="tab-pane fade" id="publish" role="tabpanel">
+                        <div class="form-group">
+                            <label asp-for="GiaTien">Giá Tiền</label>
+                            <input asp-for="GiaTien" class="form-control" type="number" step="0.01" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Video Giới thiệu / Ảnh Bìa</label>
+                            <p class="text-muted small">
+                                <i class="fas fa-info-circle"></i> Khuyến khích tải lên <strong>Video giới thiệu</strong> ngắn để thu hút học viên. Nếu không, hãy chọn Ảnh bìa hấp dẫn.
+                            </p>
+
+                            <div class="custom-file mb-3">
+                                <input asp-for="AnhBiaFile" type="file" class="custom-file-input" id="introFileUpload" accept="image/*,video/*" onchange="previewIntroFile(this)">
+                                <label class="custom-file-label" for="introFileUpload">Chọn Ảnh hoặc Video...</label>
+                            </div>
+
+                            <input type="hidden" asp-for="AnhBia" id="AnhBiaUrl" />
+
+                            <div id="intro-preview-area" class="mt-2 text-center border rounded p-2 bg-light" style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                                @if (!string.IsNullOrEmpty(Model.AnhBia))
+                                {
+                                    // Kiểm tra đuôi file để quyết định hiện thẻ Video hay Img
+                                    var url = Model.AnhBia;
+                                    var isVideo = url.EndsWith(".mp4") || url.EndsWith(".webm") || url.EndsWith(".mov") || url.Contains("/video/upload/");
+
+                                    if (isVideo)
+                                    {
+                                        <video controls src="@url" style="max-width: 100%; max-height: 300px;"></video>
+                                    }
+                                    else
+                                    {
+                                        <img src="@url" style="max-width: 100%; max-height: 300px;" class="img-fluid rounded shadow-sm" />
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Chưa có nội dung giới thiệu</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="TinNhanChaoMung">Tin Nhắn Chào Mừng</label>
+                            <textarea asp-for="TinNhanChaoMung" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <script>
+                        function previewIntroFile(input) {
+                            var file = input.files[0];
+                            var previewZone = document.getElementById('intro-preview-area');
+
+                            // Cập nhật text cho label
+                            $(input).next('.custom-file-label').html(file.name);
+
+                            if (file) {
+                                var reader = new FileReader();
+                                reader.onload = function(e) {
+                                    var content = '';
+                                    // Kiểm tra loại file
+                                    if (file.type.startsWith('video/')) {
+                                        content = `<video controls src="${e.target.result}" style="max-width: 100%; max-height: 300px;"></video>`;
+                                    } else if (file.type.startsWith('image/')) {
+                                        content = `<img src="${e.target.result}" style="max-width: 100%; max-height: 300px;" class="img-fluid rounded shadow-sm" />`;
+                                    } else {
+                                        content = '<span class="text-danger">Định dạng file không hỗ trợ xem trước</span>';
+                                    }
+                                    previewZone.innerHTML = content;
+                                }
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    </script>
+                </div>
+
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Quay lại</button>
+                    <div>
+                        <button type="button" class="btn btn-warning mr-2" onclick="saveDraftOnly()">Lưu Nháp (Toàn Bộ)</button>
+                        <button type="submit" class="btn btn-success" id="submit-btn">Gửi Xét Duyệt</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ==============================================================
+        // QUẢN LÝ TRẠNG THÁI (GLOBAL STATE)
+        // ==============================================================
+        let chuongMucIndex = 0;
+        // Các object lưu index đếm để tạo name duy nhất (không bị trùng khi thêm mới)
+        let baiGiangIndices = {};
+        let tracNghiemIndices = {};
+        let baiTapIndices = {};
+        let cauHoiTNIndices = {};
+        let cauHoiBTIndices = {};
+        let dapAnIndices = {};
+
+        // ==============================================================
+        // HÀM HỖ TRỢ CƠ BẢN
+        // ==============================================================
+        function goToStep(step) {
+            $('.wizard-step').removeClass('active');
+            $('#step-' + step).addClass('active');
+        }
+
+        function saveDraftOnly() {
+            // Tính lại toàn bộ index trước khi submit để đảm bảo thứ tự đúng
+            updateAllIndices();
+            const draftAction = $('<input>').attr({type: 'hidden', name: 'action', value: 'saveDraft', id: 'draft-action'});
+            $('#create-course-form').append(draftAction);
+            $('#create-course-form').submit();
+            $('#draft-action').remove();
+        }
+
+        function initSortable(el) {
+            if (!el || $(el).hasClass('sortable-initialized')) return;
+            Sortable.create(el, {
+                animation: 150,
+                handle: '.card-header', // Chỉ được kéo bằng header
+                ghostClass: 'sortable-ghost',
+                group: $(el).attr('id') === 'chuong-mucs' ? 'chapters' : 'content' // Ngăn kéo item ra ngoài chương
+            });
+            $(el).addClass('sortable-initialized');
+        }
+
+        $(document).ready(function() {
+            // Khởi tạo Sortable cho tất cả các container có sẵn khi load trang
+            $('.sortable-container').each(function() { initSortable(this); });
+
+            // Xử lý sự kiện click icon collapse
+            $(document).on('click', '.card-header a[data-toggle="collapse"]', function() {
+                $(this).find('.collapse-icon').toggleClass('collapsed');
+            });
+        });
+
+        // ==============================================================
+        // ⭐ LOGIC CORE: CẬP NHẬT INDEX VÀ THỨ TỰ (MIXED ORDER)
+        // ==============================================================
+        function updateAllIndices() {
+            // 1. Duyệt từng CHƯƠNG
+            $('#chuong-mucs > .chuong-muc').each(function(cmIndex, cmElement) {
+                // Update name của Chương
+                $(cmElement).find('> .collapse > .card-body > .form-group > [name]').each(function() {
+                    this.name = this.name.replace(/ChuongMucs\[\d+\]/, `ChuongMucs[${cmIndex}]`);
+                });
+                $(cmElement).find('> .collapse > .card-body > .chuongmuc-thutu-input').val(cmIndex);
+                $(cmElement).find('> .collapse > .card-body > input[type=hidden]').each(function(){
+                     this.name = this.name.replace(/ChuongMucs\[\d+\]/, `ChuongMucs[${cmIndex}]`);
+                });
+
+                // 2. Duyệt NỘI DUNG HỖN HỢP bên trong chương
+                let bgCount = 0;
+                let tnCount = 0;
+                let btCount = 0;
+
+                // Tìm container chứa nội dung hỗn hợp
+                $(cmElement).find('.chapter-content-container > .content-item').each(function(globalOrder, itemElement) {
+                    const type = $(itemElement).data('type');
+
+                    // Cập nhật trường ThuTu (Order) chung cho mọi item = vị trí thực tế trên giao diện
+                    $(itemElement).find('.item-thutu-input').val(globalOrder);
+
+                    if (type === 'bg') {
+                        // Update Bài Giảng
+                        $(itemElement).find('[name]').each(function() {
+                            // Thay thế phần [x] của BaiGiangs[x] bằng count tăng dần
+                            this.name = this.name.replace(/ChuongMucs\[\d+\]\.BaiGiangs\[\d+\]/, `ChuongMucs[${cmIndex}].BaiGiangs[${bgCount}]`);
+                        });
+                        bgCount++;
+                    }
+                    else if (type === 'tn') {
+                        // Update Trắc Nghiệm
+                        $(itemElement).find('[name]').each(function() {
+                            this.name = this.name.replace(/ChuongMucs\[\d+\]\.TracNghiems\[\d+\]/, `ChuongMucs[${cmIndex}].TracNghiems[${tnCount}]`);
+                        });
+
+                        // Update Câu Hỏi con của Trắc Nghiệm
+                        $(itemElement).find('.cau-hoi-tn').each(function(chIndex, chEl){
+                             $(chEl).find('[name]').each(function(){
+                                  this.name = this.name.replace(/CauHois\[\d+\]/, `CauHois[${chIndex}]`);
+                             });
+
+                             // Update Đáp Án con của Câu Hỏi
+                             $(chEl).find('.dap-an').each(function(daIndex, daEl){
+                                 $(daEl).find('[name]').each(function(){
+                                     this.name = this.name.replace(/DapAns\[\d+\]/, `DapAns[${daIndex}]`);
+                                 });
+                             });
+                        });
+                        tnCount++;
+                    }
+                    else if (type === 'bt') {
+                        // Update Bài Tập
+                        $(itemElement).find('[name]').each(function() {
+                            this.name = this.name.replace(/ChuongMucs\[\d+\]\.BaiTaps\[\d+\]/, `ChuongMucs[${cmIndex}].BaiTaps[${btCount}]`);
+                        });
+
+                         // Update Câu Hỏi con của Bài Tập
+                         $(itemElement).find('.cau-hoi-bt').each(function(chIndex, chEl){
+                             $(chEl).find('[name]').each(function(){
+                                  this.name = this.name.replace(/CauHois\[\d+\]/, `CauHois[${chIndex}]`);
+                             });
+                        });
+                        btCount++;
+                    }
+                });
+            });
+        }
+
+        // Gọi hàm update mỗi khi submit form
+        $('#create-course-form').on('submit', function() { updateAllIndices(); });
+
+
+        // ==============================================================
+        // CÁC HÀM THÊM MỚI (DYNAMIC ADD)
+        // ==============================================================
+
+        function addChuongMuc() {
+            const cmIndex = chuongMucIndex++;
+            const html = `
+                <div class="card mb-3 chuong-muc" data-index="${cmIndex}">
+                    <div class="card-header">
+                        <strong class="chuong-muc-title">Chương ${cmIndex + 1}: (Mới)</strong>
+                        <div class="float-right">
+                            <button type="button" class="btn btn-danger btn-sm mr-2" onclick="$(this).closest('.chuong-muc').remove(); updateAllIndices()">Xóa Chương</button>
+                            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#collapseCm-${cmIndex}"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="collapseCm-${cmIndex}">
+                        <div class="card-body bg-light">
+                            <div class="form-group"><label>Tên Chương</label><input name="ChuongMucs[${cmIndex}].TenChuong" class="form-control font-weight-bold" required onkeyup="$(this).closest('.chuong-muc').find('.chuong-muc-title').text('Chương ${cmIndex + 1}: ' + (this.value || '(Mới)'))" /></div>
+                            <input type="hidden" name="ChuongMucs[${cmIndex}].ThuTu" class="chuongmuc-thutu-input" value="${cmIndex}" />
+
+                            <h6 class="mt-3 text-primary">Nội dung trong chương</h6>
+                            <div id="content-container-${cmIndex}" class="chapter-content-container sortable-container mb-3"></div>
+
+                            <div class="btn-group w-100">
+                                <button type="button" class="btn btn-outline-primary" onclick="addBaiGiang(${cmIndex})"><i class="fas fa-plus"></i> Bài Giảng</button>
+                                <button type="button" class="btn btn-outline-warning" onclick="addTracNghiem(${cmIndex})"><i class="fas fa-plus"></i> Trắc Nghiệm</button>
+                                <button type="button" class="btn btn-outline-success" onclick="addBaiTap(${cmIndex})"><i class="fas fa-plus"></i> Bài Tập</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            $('#chuong-mucs').append(html);
+            initSortable(document.getElementById(`content-container-${cmIndex}`));
+        }
+
+        function addBaiGiang(cmIndex) {
+            if (!baiGiangIndices[cmIndex]) baiGiangIndices[cmIndex] = 0;
+            const bgIndex = baiGiangIndices[cmIndex]++;
+            const id = `bg-new-${cmIndex}-${bgIndex}`;
+
+            @* const html = ` *@
+            @*     <div class="card mb-2 bai-giang content-item" data-type="bg"> *@
+            @*         <div class="card-header p-2"> *@
+            @*             <strong class="bg-title"><i class="fas fa-video mr-2"></i>Bài Giảng (Mới)</strong> *@
+            @*             <div class="float-right"> *@
+            @*                 <button type="button" class="btn btn-success btn-sm mr-1" onclick="saveDraftOnly()">Lưu</button> *@
+            @*                 <button type="button" class="btn btn-danger btn-sm mr-1" onclick="$(this).closest('.bai-giang').remove(); updateAllIndices()">Xóa</button> *@
+            @*                 <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#${id}"><i class="fas fa-chevron-down collapse-icon"></i></a> *@
+            @*             </div> *@
+            @*         </div> *@
+            @*         <div class="collapse show" id="${id}"> *@
+            @*             <div class="card-body"> *@
+            @*                 <div class="form-group"><label>Video</label><input type="file" name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].VideoFile" class="form-control" accept="video/*" onchange="$(this).closest('.bai-giang').find('.bg-title').text('Bài Giảng: ' + this.files[0].name)" /></div> *@
+            @*                 <div class="form-group"><label>Bài Viết</label><textarea name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].BaiViet" class="form-control" rows="2"></textarea></div> *@
+            @*                 <input type="hidden" name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].ThuTu" class="item-thutu-input" value="0" /> *@
+            @*             </div> *@
+            @*         </div> *@
+            @*     </div>`; *@
+            @* $(`#content-container-${cmIndex}`).append(html); *@
+                const html = `
+            <div class="card mb-2 bai-giang content-item" data-type="bg">
+                <div class="card-header p-2">
+                    </div>
+                <div class="collapse show" id="${id}">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Video</label>
+                            <input type="file" name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].VideoFile" class="form-control" accept="video/*" onchange="..." />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tài liệu đính kèm (PDF, Word...)</label>
+                            <input type="file" name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].TaiLieuFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar" />
+                        </div>
+                        <div class="form-group"><label>Bài Viết</label><textarea name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].BaiViet" class="form-control" rows="2"></textarea></div>
+                        <input type="hidden" name="ChuongMucs[${cmIndex}].BaiGiangs[${bgIndex}].ThuTu" class="item-thutu-input" value="0" />
+                    </div>
+                </div>
+            </div>`;
+        $(`#content-container-${cmIndex}`).append(html);
+        }
+
+        function addTracNghiem(cmIndex) {
+            if (!tracNghiemIndices[cmIndex]) tracNghiemIndices[cmIndex] = 0;
+            const tnIndex = tracNghiemIndices[cmIndex]++;
+            const id = `tn-new-${cmIndex}-${tnIndex}`;
+
+            const html = `
+                <div class="card mb-2 trac-nghiem content-item" data-type="tn">
+                    <div class="card-header p-2">
+                        <strong class="tn-title"><i class="fas fa-question-circle mr-2"></i>Trắc Nghiệm (Mới)</strong>
+                        <div class="float-right">
+                            <button type="button" class="btn btn-success btn-sm mr-1" onclick="saveDraftOnly()">Lưu</button>
+                            <button type="button" class="btn btn-danger btn-sm mr-1" onclick="$(this).closest('.trac-nghiem').remove(); updateAllIndices()">Xóa</button>
+                            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#${id}"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="${id}">
+                        <div class="card-body">
+                            <div class="form-group"><label>Tiêu Đề</label><input name="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].TieuDe" class="form-control" onkeyup="$(this).closest('.trac-nghiem').find('.tn-title').text('Trắc Nghiệm: ' + (this.value || '(Mới)'))" /></div>
+                            <input type="hidden" name="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].ThuTu" class="item-thutu-input" value="0" />
+
+                            <div class="cau-hois mb-3 sortable-container p-2 bg-white border rounded">
+                                <h6 class="text-muted font-italic">Danh sách câu hỏi</h6>
+                            </div>
+                            <button type="button" class="btn btn-info btn-sm" onclick="addCauHoiTN(${cmIndex}, ${tnIndex})">Thêm Câu Hỏi</button>
+                        </div>
+                    </div>
+                </div>`;
+            const newEl = $(html).appendTo(`#content-container-${cmIndex}`);
+            initSortable(newEl.find('.cau-hois')[0]);
+        }
+
+                function addBaiTap(cmIndex) {
+            if (!baiTapIndices[cmIndex]) baiTapIndices[cmIndex] = 0;
+            const btIndex = baiTapIndices[cmIndex]++;
+            const id = `bt-new-${cmIndex}-${btIndex}`;
+
+            const html = `
+                <div class="card mb-2 bai-tap content-item" data-type="bt">
+                    <div class="card-header p-2">
+                        <strong class="bt-title"><i class="fas fa-file-alt mr-2"></i>Bài Tập (Mới)</strong>
+                        <div class="float-right">
+                            <button type="button" class="btn btn-success btn-sm mr-1" onclick="saveDraftOnly()">Lưu</button>
+                            <button type="button" class="btn btn-danger btn-sm mr-1" onclick="$(this).closest('.bai-tap').remove(); updateAllIndices()">Xóa</button>
+                            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#${id}"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="${id}">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Tiêu Đề</label>
+                                <input name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].TieuDe" class="form-control" onkeyup="$(this).closest('.bai-tap').find('.bt-title').text('Bài Tập: ' + (this.value || '(Mới)'))" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Thời lượng (phút)</label>
+                                        <input type="number" name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].ThoiLuong" class="form-control" placeholder="VD: 15" />
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Tải file Hướng dẫn</label>
+                                        <input type="file" name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].HuongDanFile" class="form-control" accept=".pdf,.doc,.docx,.png,.jpg" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Hoặc Nhập Hướng dẫn (Văn bản)</label>
+                                <textarea name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].HuongDan" class="form-control" rows="2" placeholder="Hướng dẫn làm bài..."></textarea>
+                            </div>
+                            <input type="hidden" name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].ThuTu" class="item-thutu-input" value="0" />
+
+                            <div class="cau-hois-bt mb-3 sortable-container p-2 bg-white border rounded">
+                                <h6 class="text-muted font-italic">Câu hỏi bài tập</h6>
+                            </div>
+                            <button type="button" class="btn btn-info btn-sm" onclick="addCauHoiBT(${cmIndex}, ${btIndex})">Thêm Câu Hỏi BT</button>
+                        </div>
+                    </div>
+                </div>`;
+
+            const newEl = $(html).appendTo(`#content-container-${cmIndex}`);
+            initSortable(newEl.find('.cau-hois-bt')[0]);
+        }
+
+        function addCauHoiTN(cmIndex, tnIndex) {
+            const key = `${cmIndex}-${tnIndex}`;
+            if (!cauHoiTNIndices[key]) cauHoiTNIndices[key] = 0;
+            const chIndex = cauHoiTNIndices[key]++;
+            const id = `chtn-new-${cmIndex}-${tnIndex}-${chIndex}`;
+
+            const html = `
+                <div class="card mb-2 cau-hoi-tn">
+                    <div class="card-header p-1 bg-light">
+                        <span class="chtn-title">Câu Hỏi Mới</span>
+                        <div class="float-right">
+                            <button type="button" class="btn btn-danger btn-sm py-0" onclick="$(this).closest('.cau-hoi-tn').remove(); updateAllIndices()">Xóa</button>
+                            <a class="btn btn-sm btn-link py-0" data-toggle="collapse" href="#${id}"><i class="fas fa-chevron-down collapse-icon"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse show" id="${id}">
+                        <div class="card-body p-2">
+                            <textarea name="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].CauHois[${chIndex}].NoiDung" class="form-control mb-2" rows="2" placeholder="Nội dung câu hỏi..." onkeyup="$(this).closest('.cau-hoi-tn').find('.chtn-title').text('Câu Hỏi: ' + (this.value.substring(0,20) || 'Mới'))"></textarea>
+
+                            <div class="dap-ans sortable-container pl-3 border-left"></div>
+                            <button type="button" class="btn btn-link btn-sm pl-0" onclick="addDapAn(${cmIndex}, ${tnIndex}, ${chIndex})">+ Thêm Đáp Án</button>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Tìm đúng div chứa câu hỏi của trắc nghiệm này (vì input name có thể chưa update, nên dùng data-type và tìm parent)
+            // Cách đơn giản nhất: tìm theo name attribute hiện tại trong DOM
+            const container = $(`input[name^="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}]"]`).closest('.trac-nghiem').find('.cau-hois');
+            const newEl = $(html).appendTo(container);
+            initSortable(newEl.find('.dap-ans')[0]);
+        }
+
+                function addDapAn(cmIndex, tnIndex, chIndex) {
+            const key = `${cmIndex}-${tnIndex}-${chIndex}`;
+            if (!dapAnIndices[key]) dapAnIndices[key] = 0;
+            const daIndex = dapAnIndices[key]++;
+
+            const html = `
+                <div class="card mb-1 dap-an">
+                    <div class="card-body p-2">
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="checkbox" name="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].CauHois[${chIndex}].DapAns[${daIndex}].KetQua" value="true" class="mr-2" title="Là đáp án đúng" style="transform: scale(1.2);" />
+                            <input name="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].CauHois[${chIndex}].DapAns[${daIndex}].NoiDung" class="form-control mr-2" placeholder="Nội dung đáp án..." />
+                            <button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('.dap-an').remove(); updateAllIndices()"><i class="fas fa-times"></i></button>
+                        </div>
+                        <textarea name="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].CauHois[${chIndex}].DapAns[${daIndex}].GiaiThich" class="form-control form-control-sm bg-light" rows="1" placeholder="Giải thích (tùy chọn)..."></textarea>
+                    </div>
+                </div>`;
+
+            // Tìm đúng container để append
+            // Logic tìm container này an toàn hơn: tìm từ nút button vừa được click
+            // (Lưu ý: Cần đảm bảo nút "Thêm Đáp Án" trong HTML gọi hàm này với 'this' nếu muốn dùng cách tìm $(this),
+            // nhưng ở đây ta dùng selector name nên vẫn ổn với code cũ)
+            const container = $(`textarea[name^="ChuongMucs[${cmIndex}].TracNghiems[${tnIndex}].CauHois[${chIndex}]"]`).closest('.cau-hoi-tn').find('.dap-ans');
+            container.append(html);
+        }
+
+
+        function addCauHoiBT(cmIndex, btIndex) {
+            const key = `${cmIndex}-${btIndex}`;
+            if (!cauHoiBTIndices[key]) cauHoiBTIndices[key] = 0;
+            const chIndex = cauHoiBTIndices[key]++;
+
+            const html = `
+                <div class="card mb-2 cau-hoi-bt">
+                    <div class="card-body p-2">
+                        <div class="form-group mb-1">
+                            <textarea name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].CauHois[${chIndex}].NoiDung" class="form-control" rows="2" placeholder="Nội dung câu hỏi bài tập..."></textarea>
+                        </div>
+                        <div class="form-group mb-1">
+                            <textarea name="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}].CauHois[${chIndex}].DapAnMau" class="form-control" rows="1" placeholder="Đáp án mẫu..."></textarea>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm mt-1" onclick="$(this).closest('.cau-hoi-bt').remove(); updateAllIndices()">Xóa Câu Hỏi</button>
+                    </div>
+                </div>`;
+
+            const container = $(`input[name^="ChuongMucs[${cmIndex}].BaiTaps[${btIndex}]"]`).closest('.bai-tap').find('.cau-hois-bt');
+            container.append(html);
+        }
+    </script>
+
+    @* Thêm đoạn này vào cuối file TaoKhoaHoc.cshtml *@
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <script>
+            window.onload = function() {
+                // Lấy tất cả lỗi
+                var errors = [];
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    @:errors.push("@Html.Raw(error.ErrorMessage)");
+                }
+            }
+
+                // Nếu có lỗi liên quan đến hồ sơ, hiển thị Alert
+                var profileError = errors.find(e => e.includes("Hồ sơ của bạn chưa đủ điều kiện"));
+                if (profileError) {
+                    alert(profileError);
+                    // Hoặc dùng Modal Bootstrap nếu muốn đẹp hơn
+                }
+            }
+        </script>
+    }
+</body>
+</html>
+

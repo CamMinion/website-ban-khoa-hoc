@@ -1,0 +1,233 @@
+﻿
+@*     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860 *@
+
+@* @{ *@
+@* } *@
+@* @{ *@
+@*     Layout = "~/Views/Shared/_GiangVien_Layout.cshtml"; *@
+@* } *@
+@* @model List<QL_KhoaHoc.Models.KhoaHoc> *@
+@* <h2>Quản Lý Bản Nháp</h2> *@
+@* <table class="table"> *@
+@*     <thead><tr><th>Tên</th><th>Trạng Thái</th><th>Hành Động</th></tr></thead> *@
+@*     <tbody> *@
+@*         @foreach (var item in Model) *@
+@*         { *@
+@*             <tr> *@
+@*                 <td>@item.TenKhoaHoc</td> *@
+@*                 <td>@item.TrangThai</td> *@
+@*                 <td> *@
+@*                     <a asp-action="TaoKhoaHoc" asp-route-id="@item.MaKhoaHoc">Chỉnh Sửa</a> | *@
+@*                     <a href="#" onclick="deleteDraft(@item.MaKhoaHoc)">Xóa</a> *@
+@*                 </td> *@
+@*             </tr> *@
+@*         } *@
+@*     </tbody> *@
+@* </table> *@
+@* <script> *@
+@*     function deleteDraft(id) { *@
+@*         if (confirm('Xác nhận xóa?')) { *@
+@*             $.ajax({ *@
+@*                 url: '/api/KhoaHoc/' + id, *@
+@*                 type: 'DELETE', *@
+@*                 success: function() { location.reload(); } *@
+@*             }); *@
+@*         } *@
+@*     } *@
+@* </script> *@
+
+
+@* @model List<QL_KhoaHoc.Models.KhoaHoc> *@
+@* @{ *@
+@*     Layout = "~/Views/Shared/_GiangVien_Layout.cshtml"; *@
+@* } *@
+
+@* <h2>Quản Lý Bản Nháp</h2> *@
+@* <table class="table"> *@
+@*     <thead> *@
+@*         <tr> *@
+@*             <th>Tên</th> *@
+@*             <th>Trạng Thái</th> *@
+@*             <th>Hành Động</th> *@
+@*         </tr> *@
+@*     </thead> *@
+@*     <tbody> *@
+@*         @foreach (var item in Model) *@
+@*         { *@
+@*             <tr> *@
+@*                 <td>@item.TenKhoaHoc</td> *@
+@*                 <td> *@
+@*                     <span class="badge badge-warning">@item.TrangThai</span> *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     <a asp-action="TaoKhoaHoc" asp-route-id="@item.MaKhoaHoc" class="btn btn-sm btn-primary"> *@
+@*                         <i class="fas fa-edit"></i> Sửa *@
+@*                     </a> *@
+
+@*                     <a href="@Url.Action("Hoc", "KhoaHoc", new { id = item.MaKhoaHoc, isPreview = true })" *@
+@*                        target="_blank" *@
+@*                        class="btn btn-sm btn-info"> *@
+@*                         <i class="fas fa-eye"></i> Xem *@
+@*                     </a> *@
+
+@*                     <a href="#" onclick="deleteDraft(@item.MaKhoaHoc)" class="btn btn-sm btn-danger"> *@
+@*                         <i class="fas fa-trash"></i> Xóa *@
+@*                     </a> *@
+@*                 </td> *@
+@*             </tr> *@
+@*         } *@
+@*     </tbody> *@
+@* </table> *@
+
+@* <script> *@
+@*     function deleteDraft(id) { *@
+@*         if (confirm('Xác nhận xóa bản nháp này?')) { *@
+@*             $.ajax({ *@
+@*                 url: '/api/KhoaHoc/' + id, // Đảm bảo API này đúng đường dẫn *@
+@*                 type: 'DELETE', *@
+@*                 success: function() { *@
+@*                     location.reload(); *@
+@*                 }, *@
+@*                 error: function() { *@
+@*                     alert("Có lỗi xảy ra khi xóa!"); *@
+@*                 } *@
+@*             }); *@
+@*         } *@
+@*     } *@
+@* </script> *@
+
+
+@model List<QL_KhoaHoc.Models.KhoaHoc>
+@{
+    Layout = "~/Views/Shared/_GiangVien_Layout.cshtml";
+    ViewData["Title"] = "Quản Lý Bản Nháp Khóa Học";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2 class="display-5 text-dark">
+                <i class="fas fa-file-alt text-warning mr-2"></i> Quản Lý Bản Nháp Khóa Học
+            </h2>
+            <p class="text-muted">Nơi lưu trữ các khóa học chưa hoàn thiện. Hãy tiếp tục chỉnh sửa để xuất bản!</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a asp-action="TaoKhoaHoc" class="btn btn-success btn-lg shadow-sm">
+                <i class="fas fa-plus-circle"></i> **Tạo Khóa Học Mới**
+            </a>
+        </div>
+    </div>
+
+    @* Bổ sung nội dung "râu ria" - Thông báo nếu không có bản nháp *@
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5 shadow-sm" role="alert">
+            <h4 class="alert-heading"><i class="fas fa-box-open"></i> Không có bản nháp nào!</h4>
+            <p>Hiện tại bạn chưa có bản nháp khóa học nào đang chờ xử lý. Hãy bắt đầu tạo một khóa học mới ngay bây giờ.</p>
+            <hr>
+            <a asp-action="TaoKhoaHoc" class="btn btn-info mt-2">
+                <i class="fas fa-pencil-alt"></i> Bắt Đầu Tạo Khóa Học
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-list-ul"></i> Danh Sách Bản Nháp</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 50%;">Tên Khóa Học</th>
+                            <th style="width: 20%;">Trạng Thái</th>
+                            <th style="width: 30%;" class="text-center">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    **@item.TenKhoaHoc**
+                                    <br>
+                                    <small class="text-muted">Mã: @item.MaKhoaHoc</small>
+                                </td>
+                                <td>
+                                    @* Thay badge-warning bằng badge-secondary/info cho bản nháp *@
+                                    <span class="badge badge-pill badge-secondary p-2">
+                                        <i class="fas fa-pen-nib"></i> @item.TrangThai
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    @* Nút Sửa: Thay btn-primary bằng btn-warning để phù hợp với việc chỉnh sửa *@
+                                    <a asp-action="TaoKhoaHoc" asp-route-id="@item.MaKhoaHoc" class="btn btn-sm btn-warning text-dark mx-1" title="Tiếp tục chỉnh sửa">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+
+                                    @* Nút Xem: Giữ nguyên btn-info *@
+                                    <a href="@Url.Action("Hoc", "KhoaHoc", new { id = item.MaKhoaHoc, isPreview = true })"
+                                       target="_blank"
+                                       class="btn btn-sm btn-info mx-1" title="Xem trước khóa học">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+
+                                    @* Nút Xóa: Giữ nguyên btn-danger *@
+                                    <button type="button" onclick="deleteDraft(@item.MaKhoaHoc, '@item.TenKhoaHoc')" class="btn btn-sm btn-danger mx-1" title="Xóa bản nháp này">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    @* Bổ sung nội dung "râu ria" - Khu vực thống kê nhanh *@
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card bg-light shadow-sm border-left-success">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Tổng số Bản Nháp
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count()</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cập nhật hàm deleteDraft để truyền tên khóa học vào thông báo
+    function deleteDraft(id, tenKhoaHoc) {
+        if (confirm(`Bạn có chắc chắn muốn xóa bản nháp: "${tenKhoaHoc}" không? Thao tác này không thể hoàn tác.`)) {
+            // Cần đảm bảo thư viện jQuery đã được tải trong layout
+            $.ajax({
+                url: '/api/KhoaHoc/' + id, // Đảm bảo API này đúng đường dẫn
+                type: 'DELETE',
+                beforeSend: function() {
+                    // Có thể thêm hiệu ứng loading tại đây
+                },
+                success: function(response) {
+                    alert("Đã xóa bản nháp thành công!");
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    // Hiển thị thông báo lỗi chi tiết hơn
+                    alert(`Có lỗi xảy ra khi xóa bản nháp! Lỗi: ${xhr.status} - ${error}`);
+                }
+            });
+        }
+    }
+</script>

@@ -1,0 +1,409 @@
+﻿@model IEnumerable<QL_KhoaHoc.Models.KhoaHoc>
+@{
+    ViewData["Title"] = "Trang chủ - Khóa học nổi bật";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="banner-dynamic mb-5">
+        <div class="banner-content text-center">
+            <h1 class="fw-bold animate-text">KHÁM PHÁ TRI THỨC MỚI</h1>
+            <p class="lead text-light opacity-75 mt-2">Nâng cao kỹ năng, chinh phục tương lai cùng hàng trăm khóa học chất lượng.</p>
+            <div class="mt-4">
+                <a href="#list-courses" class="btn btn-light rounded-pill px-4 py-2 fw-bold text-primary shadow-sm hover-scale">
+                    Bắt đầu học ngay <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="waves">
+            <svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+                    <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+                    <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+                    <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <div class="mb-5" id="section-goi-y" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <h3 class="fw-bold text-secondary">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>Gợi ý cho riêng bạn
+            </h3>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="list-goi-y">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+            </div>
+        </div>
+
+        <div id="suggestion-pagination" class="d-flex justify-content-center mt-4"></div>
+    </div>
+
+    <div class="d-flex align-items-center mb-4 mt-5">
+        <h2 class="fw-semibold m-0">🔥 Khóa học nổi bật</h2>
+        <span class="ms-3 badge bg-light text-secondary border">Trang @ViewBag.CurrentPage / @ViewBag.TotalPages</span>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var kh in Model)
+            {
+                // Kiểm tra Video/Ảnh
+                bool isVideo = !string.IsNullOrEmpty(kh.AnhBia) &&
+                (kh.AnhBia.EndsWith(".mp4") || kh.AnhBia.Contains("/video/upload/"));
+
+                <div class="col">
+                    <div class="card shadow-sm border-0 h-100 transition-hover" style="border-radius: 15px;">
+                        <div class="position-relative media-wrapper">
+                            @if (isVideo)
+                            {
+                                <video src="@kh.AnhBia" class="card-img-top media-content" muted loop onmouseover="this.play()" onmouseout="this.pause();"></video>
+                                <span class="badge bg-dark bg-opacity-75 position-absolute top-50 start-50 translate-middle pointer-events-none">
+                                    <i class="bi bi-play-circle fs-1"></i>
+                                </span>
+                            }
+                            else
+                            {
+                                <img src="@(string.IsNullOrEmpty(kh.AnhBia) ? "https://via.placeholder.com/300x200" : kh.AnhBia)"
+                                     class="card-img-top media-content" alt="@kh.TenKhoaHoc">
+                            }
+
+                            @if (kh.DaPhatHanh)
+                            {
+                                <span class="badge bg-success position-absolute top-0 end-0 m-2">Phát hành</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary position-absolute top-0 end-0 m-2">Sắp ra mắt</span>
+                            }
+                        </div>
+
+                        <div class="card-body d-flex flex-column p-3">
+                            <h6 class="card-title fw-bold text-truncate mb-1" title="@kh.TenKhoaHoc">@kh.TenKhoaHoc</h6>
+                            <p class="text-muted small two-line-clamp mb-2">@kh.MoTaNgan</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-danger">@String.Format("{0:N0} đ", kh.GiaTien)</span>
+                                    <span class="text-secondary small" style="font-size: 0.75rem;"><i class="bi bi-person"></i> @kh.SoDangKy</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-warning small"><i class="bi bi-star-fill"></i> @kh.SoDanhGia đánh giá</span>
+                                </div>
+                                <a href="/KhoaHoc/ChiTietKH/@kh.MaKhoaHoc" class="btn btn-outline-primary btn-sm w-100 rounded-pill">Xem ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center text-muted py-5"><p>Không tìm thấy khóa học nào.</p></div>
+        }
+    </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-5">
+            <nav aria-label="Page navigation">
+                <ul class="pagination shadow-sm">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link border-0" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link border-0 @(i == ViewBag.CurrentPage ? "bg-primary text-white" : "text-dark")"
+                               href="@Url.Action("Index", new { page = i })">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link border-0" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<style>
+    /* Chỉnh kích thước media để phù hợp layout 4 cột */
+    .media-content {
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        background-color: #000;
+    }
+
+    .transition-hover {
+        transition: transform 0.2s;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+
+    .two-line-clamp {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .pointer-events-none {
+        pointer-events: none;
+    }
+</style>
+
+<style>
+    /* CSS cho Banner động */
+    .banner-dynamic {
+        background: linear-gradient(-45deg, #0d6efd, #0dcaf0, #6610f2, #d63384);
+        background-size: 400% 400%;
+        animation: gradientBG 10s ease infinite;
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+        padding: 80px 20px 100px; /* Padding dưới lớn để chứa sóng */
+        color: white;
+    }
+
+    @@keyframes gradientBG {
+        0%
+
+    {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+
+    }
+
+    /* Hiệu ứng chữ chạy màu */
+    .animate-text {
+        font-size: 3rem;
+        background: linear-gradient(to right, #fff, #ffee00, #fff);
+        background-size: 200% auto;
+        color: #fff;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 3s linear infinite;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    @@keyframes shine {
+        to
+
+    {
+        background-position: 200% center;
+    }
+
+    }
+
+    /* Hiệu ứng nút */
+    .hover-scale {
+        transition: transform 0.3s;
+    }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+    /* Hiệu ứng sóng nước cuối banner */
+    .waves {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        overflow: hidden;
+    }
+
+    .waves-svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    .parallax > use {
+        animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+    }
+
+        .parallax > use:nth-child(1) {
+            animation-delay: -2s;
+            animation-duration: 7s;
+        }
+
+        .parallax > use:nth-child(2) {
+            animation-delay: -3s;
+            animation-duration: 10s;
+        }
+
+        .parallax > use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 13s;
+        }
+
+        .parallax > use:nth-child(4) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+        }
+
+    @@keyframes move-forever {
+        0%
+
+    {
+        transform: translate3d(-90px,0,0);
+    }
+
+    100% {
+        transform: translate3d(85px,0,0);
+    }
+
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // --- CẤU HÌNH GỢI Ý ---
+    var allSuggestions = []; // Chứa toàn bộ dữ liệu gợi ý tải về
+    var suggestionPageSize = 4; // Hiển thị 4 gợi ý/trang (để khớp với 4 cột)
+    var currentSuggestionPage = 1;
+
+    $(document).ready(function () {
+        loadGoiYKhoaHoc();
+    });
+
+    function loadGoiYKhoaHoc() {
+        $.ajax({
+            url: '/KhoaHoc/GetGoiYKhoaHoc',
+            type: 'GET',
+            cache: false,
+            success: function (data) {
+                if (data && data.length > 0) {
+                    allSuggestions = data;
+                    $('#section-goi-y').fadeIn();
+                    // Render trang 1
+                    renderSuggestions(1);
+                } else {
+                    $('#section-goi-y').hide();
+                }
+            },
+            error: function (err) {
+                console.log('Chưa đăng nhập hoặc lỗi gợi ý:', err);
+                $('#section-goi-y').hide();
+            }
+        });
+    }
+
+    // Hàm render gợi ý theo trang (JS)
+    function renderSuggestions(page) {
+        currentSuggestionPage = page;
+        var start = (page - 1) * suggestionPageSize;
+        var end = start + suggestionPageSize;
+        var pageItems = allSuggestions.slice(start, end);
+        var htmlContent = '';
+
+        $.each(pageItems, function (index, kh) {
+            var giaTienDisplay = kh.giaTien ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(kh.giaTien).replace('₫', '$') : '';
+            var linkChiTiet = '/KhoaHoc/ChiTietKH/' + kh.maKH;
+
+            // Logic Video/Ảnh
+            var mediaUrl = kh.anhBia || '';
+            var isVideo = mediaUrl.includes('.mp4') || mediaUrl.includes('/video/upload/');
+            var mediaElement = '';
+
+            if (isVideo) {
+                mediaElement = `
+                    <video src="${mediaUrl}" class="card-img-top media-content" muted loop onmouseover="this.play()" onmouseout="this.pause();"></video>
+                    <span class="badge bg-dark bg-opacity-75 position-absolute top-50 start-50 translate-middle pointer-events-none"><i class="bi bi-play-circle fs-1"></i></span>`;
+            } else {
+                var imgSrc = mediaUrl || 'https://via.placeholder.com/300x200?text=Course';
+                mediaElement = `<img src="${imgSrc}" class="card-img-top media-content" alt="${kh.tenKH}">`;
+            }
+
+            // Lưu ý: class "col" ở đây sẽ tự động ăn theo row-cols-lg-4 của cha
+            htmlContent += `
+            <div class="col">
+                <div class="card shadow-sm border-0 h-100 bg-light transition-hover" style="border-radius: 15px; border: 2px solid #ffc107 !important;">
+                    <div class="position-relative media-wrapper">
+                        ${mediaElement}
+                        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2"><i class="bi bi-star-fill"></i> Đề xuất</span>
+                    </div>
+                    <div class="card-body d-flex flex-column p-3">
+                        <h6 class="text-uppercase text-primary small fw-bold mb-1">${kh.tenDanhMuc || 'Khóa học'}</h6>
+                        <h6 class="card-title fw-bold text-truncate mb-1" title="${kh.tenKH}">${kh.tenKH}</h6>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-danger">${giaTienDisplay}</span>
+                            </div>
+                            <a href="${linkChiTiet}" class="btn btn-primary btn-sm w-100 rounded-pill">Xem ngay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        $('#list-goi-y').html(htmlContent);
+        renderPaginationControls();
+    }
+
+    // Hàm tạo thanh phân trang cho Gợi ý
+    function renderPaginationControls() {
+        var totalPages = Math.ceil(allSuggestions.length / suggestionPageSize);
+        if (totalPages <= 1) {
+            $('#suggestion-pagination').html('');
+            return;
+        }
+
+        var html = `<nav><ul class="pagination pagination-sm shadow-sm">`;
+
+        // Nút Trước
+        html += `<li class="page-item ${currentSuggestionPage === 1 ? 'disabled' : ''}">
+                    <button class="page-link border-0" onclick="renderSuggestions(${currentSuggestionPage - 1})">&laquo;</button>
+                 </li>`;
+
+        // Số trang
+        for (var i = 1; i <= totalPages; i++) {
+            var activeClass = (i === currentSuggestionPage) ? 'active bg-warning border-warning' : '';
+            var activeStyle = (i === currentSuggestionPage) ? 'background-color: #ffc107; color: black; border-color: #ffc107;' : 'color: #333;';
+
+            html += `<li class="page-item">
+                        <button class="page-link border-0" style="${activeStyle}" onclick="renderSuggestions(${i})">${i}</button>
+                     </li>`;
+        }
+
+        // Nút Sau
+        html += `<li class="page-item ${currentSuggestionPage === totalPages ? 'disabled' : ''}">
+                    <button class="page-link border-0" onclick="renderSuggestions(${currentSuggestionPage + 1})">&raquo;</button>
+                 </li>`;
+
+        html += `</ul></nav>`;
+        $('#suggestion-pagination').html(html);
+    }
+</script>

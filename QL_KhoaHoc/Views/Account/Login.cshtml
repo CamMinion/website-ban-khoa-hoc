@@ -1,0 +1,181 @@
+﻿@model QL_KhoaHoc.Models.LoginModel
+
+@{
+    ViewData["Title"] = "Đăng Nhập Hệ Thống";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    /* Sử dụng lại tông màu của trang Đăng ký để đồng bộ thương hiệu */
+    .login-wrapper {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .card-login {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        overflow: hidden;
+        background: white;
+        width: 100%;
+        max-width: 900px; /* Nhỏ hơn trang đăng ký một chút */
+    }
+
+    /* Ảnh nền bên trái: Chủ đề tập trung/làm việc */
+    .bg-login-image {
+        background-image: url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1352&q=80');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        min-height: 450px;
+    }
+
+    .bg-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));
+    }
+
+    .login-content {
+        padding: 50px 40px;
+    }
+
+    .login-title {
+        font-weight: 800;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    .login-subtitle {
+        color: #636e72;
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+
+    /* Input styles */
+    .input-group-text {
+        background: #fff;
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        border-color: #dfe6e9;
+        color: #0984e3; /* Màu xanh dương chủ đạo cho Login */
+    }
+
+    .form-control {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        border-color: #dfe6e9;
+        padding: 12px;
+    }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #0984e3;
+        }
+
+            .form-control:focus + .input-group-text,
+            .input-group-text:has(+ .form-control:focus) {
+                border-color: #0984e3;
+            }
+
+    /* Button styles */
+    .btn-login {
+        background: linear-gradient(45deg, #0984e3, #74b9ff);
+        border: none;
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(9, 132, 227, 0.3);
+            color: white;
+        }
+
+    .register-link {
+        color: #0984e3;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="login-wrapper">
+    <div class="card card-login">
+        <div class="row g-0">
+            <div class="col-lg-6 d-none d-lg-block bg-login-image">
+                <div class="bg-overlay"></div>
+                <div class="d-flex align-items-end h-100 p-4 position-relative text-white">
+                    <div>
+                        <h4 class="fw-bold">Chào mừng trở lại!</h4>
+                        <p class="mb-0 small">Tiếp tục hành trình chinh phục kiến thức của bạn.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="login-content">
+                    <h2 class="login-title">Đăng Nhập</h2>
+                    <p class="login-subtitle">Vui lòng nhập thông tin xác thực của bạn</p>
+
+                    <form asp-action="Login" method="post" autocomplete="off">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="TenDN" class="form-label fw-bold small text-muted">Tên Đăng Nhập</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                <input asp-for="TenDN" class="form-control" placeholder="Nhập tên đăng nhập/email" autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="TenDN" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label asp-for="MatKhau" class="form-label fw-bold small text-muted">Mật Khẩu</label>
+                                <a href="#" class="small text-muted text-decoration-none">Quên mật khẩu?</a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                <input asp-for="MatKhau" type="password" class="form-control" placeholder="••••••••" autocomplete="new-password" />
+                            </div>
+                            <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-login">
+                                Đăng Nhập <i class="fas fa-sign-in-alt ms-2"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <span class="text-muted small">Chưa có tài khoản?</span>
+                            <a asp-controller="Account" asp-action="Register" class="register-link ms-1">
+                                Đăng ký ngay
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

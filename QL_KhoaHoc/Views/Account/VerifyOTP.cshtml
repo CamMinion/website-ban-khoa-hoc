@@ -1,0 +1,258 @@
+﻿
+@*     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860 *@
+
+@* @{ *@
+@* } *@
+@* <!-- Tạo file Views/Account/VerifyOTP.cshtml --> *@
+@* @model QL_KhoaHoc.Models.VerifyOTPModel *@
+
+@* @{ *@
+@*     ViewData["Title"] = "Xác Thực OTP"; *@
+@*     Layout = "~/Views/Shared/_HocVien_Layout.cshtml"; *@
+@* } *@
+
+@* <h2>Xác Thực OTP</h2> *@
+@* <p>Mã OTP đã gửi đến email của bạn. Vui lòng nhập để xác thực.</p> *@
+
+@* <form asp-action="VerifyOTP" method="post"> *@
+@*     <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
+
+@*     <div class="form-group"> *@
+@*         <label asp-for="OTP">Mã OTP (6 số)</label> *@
+@*         <input asp-for="OTP" class="form-control" maxlength="6" /> *@
+@*         <span asp-validation-for="OTP" class="text-danger"></span> *@
+@*     </div> *@
+
+@*     <button type="submit" class="btn btn-primary">Xác Thực</button> *@
+@* </form> *@
+
+@model QL_KhoaHoc.Models.VerifyOTPModel
+
+@{
+    ViewData["Title"] = "Xác Thực OTP";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    /* --- CSS Giao diện Đẹp --- */
+    .otp-wrapper {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .card-otp {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        overflow: hidden;
+        background: white;
+        width: 100%;
+        max-width: 850px;
+        position: relative;
+    }
+
+    /* Thanh Loading chạy ngang */
+    .loading-bar-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background-color: #f1f2f6;
+        z-index: 10;
+        display: none;
+    }
+
+    .loading-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #00b894, #0984e3);
+        border-radius: 0 2px 2px 0;
+        transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Cột Hình ảnh */
+    .bg-otp-image {
+        background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        min-height: 400px;
+        position: relative;
+    }
+
+    .bg-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+    }
+
+    .otp-content {
+        padding: 50px 40px;
+        text-align: center;
+    }
+
+    .icon-box {
+        width: 70px;
+        height: 70px;
+        background: #e1f5fe;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #0288d1;
+        font-size: 30px;
+        animation: pulse 2s infinite;
+    }
+
+    .otp-input {
+        font-size: 24px;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 10px;
+        color: #2d3436;
+        border: 2px solid #dfe6e9;
+        border-radius: 10px;
+        padding: 10px;
+        transition: all 0.3s;
+    }
+
+        .otp-input:focus {
+            border-color: #00b894;
+            box-shadow: 0 0 0 0.2rem rgba(0, 184, 148, 0.25);
+            outline: none;
+        }
+
+    .btn-verify {
+        background: linear-gradient(45deg, #00b894, #00cec9);
+        border: none;
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        width: 100%;
+        margin-top: 20px;
+        transition: transform 0.2s;
+    }
+
+        .btn-verify:hover {
+            transform: scale(1.02);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(2, 136, 209, 0.7);
+        }
+
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(2, 136, 209, 0);
+        }
+
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(2, 136, 209, 0);
+        }
+    }
+</style>
+
+<div class="otp-wrapper">
+    <div class="card card-otp">
+        <div class="loading-bar-container" id="loadingContainer">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+
+        <div class="row g-0">
+            <div class="col-lg-5 d-none d-lg-block bg-otp-image">
+                <div class="bg-overlay"></div>
+                <div class="d-flex align-items-center h-100 p-4 position-relative text-white text-center">
+                    <div class="w-100">
+                        <h4 class="fw-bold mb-3">Bảo Mật 2 Lớp</h4>
+                        <p class="small">Mã xác thực giúp bảo vệ tài khoản của bạn khỏi truy cập trái phép.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="otp-content">
+                    <div class="icon-box">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+
+                    <h3 class="fw-bold text-dark mb-2">Xác Thực OTP</h3>
+                    <p class="text-muted small mb-4">
+                        Chúng tôi đã gửi mã 6 số đến email của bạn.<br>
+                        Vui lòng kiểm tra và nhập mã vào bên dưới.
+                    </p>
+
+                    <form asp-action="VerifyOTP" method="post" autocomplete="off" id="otpForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <div class="form-group mb-3">
+                            <input asp-for="OTP" class="form-control otp-input"
+                                   maxlength="6"
+                                   placeholder="------"
+                                   autocomplete="off"
+                                   required />
+                            <span asp-validation-for="OTP" class="text-danger small d-block mt-2 text-start ps-2"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-verify" id="btnSubmit">
+                            Xác Nhận Ngay <i class="fas fa-check-circle ms-2"></i>
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <p class="small text-muted">
+                            Không nhận được mã?
+                            <a href="#" class="text-decoration-none fw-bold text-primary">Gửi lại (60s)</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var form = document.getElementById('otpForm');
+
+        form.addEventListener('submit', function(e) {
+            // Kiểm tra xem input có dữ liệu không
+            var inputOtp = form.querySelector('.otp-input');
+            if (inputOtp && inputOtp.value.trim() !== "") {
+
+                // 1. Hiện container thanh loading
+                var loadingContainer = document.getElementById('loadingContainer');
+                loadingContainer.style.display = 'block';
+
+                // 2. Kích hoạt animation chạy
+                var loadingBar = document.getElementById('loadingBar');
+                // Dùng setTimeout để đảm bảo trình duyệt render xong display:block mới chạy width
+                setTimeout(function() {
+                    loadingBar.style.width = '90%';
+                }, 10);
+
+                // 3. Đổi nút bấm sang trạng thái "Đang xử lý..."
+                var btn = document.getElementById('btnSubmit');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang kiểm tra...';
+                btn.style.opacity = '0.7';
+                btn.style.pointerEvents = 'none'; // Chặn bấm liên tục
+            }
+        });
+    });
+</script>

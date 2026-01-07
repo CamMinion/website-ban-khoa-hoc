@@ -1,0 +1,303 @@
+﻿@model List<QL_KhoaHoc.Models.KhoaHoc>
+
+@{
+    ViewData["Title"] = "Khóa học của tôi";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+
+    // Phân loại khóa học
+    var listNew = Model.Where(x => x.TienDo == 0).ToList();
+    var listProgress = Model.Where(x => x.TienDo > 0 && x.TienDo < 100).OrderByDescending(x => x.NgayTao).ToList();
+    var listDone = Model.Where(x => x.TienDo >= 100).ToList();
+}
+
+<style>
+    .course-card {
+        border: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: #fff;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+        }
+
+    .course-img-wrapper {
+        position: relative;
+        height: 160px;
+        overflow: hidden;
+    }
+
+    .course-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .course-card:hover .course-img {
+        transform: scale(1.05);
+    }
+
+    .play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .course-card:hover .play-overlay {
+        opacity: 1;
+    }
+
+    .nav-pills .nav-link {
+        border-radius: 30px;
+        padding: 8px 20px;
+        font-weight: 600;
+        color: #6c757d;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        margin-right: 10px;
+    }
+
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.3);
+        }
+
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 48px;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row mb-4 align-items-end">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1"><i class="bi bi-mortarboard-fill text-primary me-2"></i>Khóa học của tôi</h2>
+            <p class="text-muted mb-0">Quản lý tiến độ và tiếp tục hành trình học tập của bạn.</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4" id="courseTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="progress-tab" data-toggle="tab" href="#progress" role="tab" onclick="switchTab(event, 'progress')">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Đang học
+                <span class="badge bg-white text-primary ms-1 rounded-pill">@listProgress.Count</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="new-tab" data-toggle="tab" href="#new" role="tab" onclick="switchTab(event, 'new')">
+                <i class="bi bi-star-fill me-1"></i> Mới đăng ký
+                <span class="badge bg-white text-secondary ms-1 rounded-pill">@listNew.Count</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="done-tab" data-toggle="tab" href="#done" role="tab" onclick="switchTab(event, 'done')">
+                <i class="bi bi-check-circle-fill me-1"></i> Đã hoàn thành
+                <span class="badge bg-white text-success ms-1 rounded-pill">@listDone.Count</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="courseTabsContent">
+
+        <div class="tab-pane fade show active" id="progress" role="tabpanel">
+            @if (listProgress.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                    @foreach (var item in listProgress)
+                    {
+                        <div class="col">
+                            <div class="card h-100 course-card shadow-sm">
+                                <div class="course-img-wrapper">
+                                    <img src="@item.AnhBia" class="course-img" alt="@item.TenKhoaHoc" onerror="this.src='/images/default-course.jpg'">
+                                    <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="play-overlay text-decoration-none">
+                                        <span class="btn btn-light rounded-circle shadow" style="width: 50px; height: 50px; display:flex; align-items:center; justify-content:center;">
+                                            <i class="bi bi-play-fill fs-3 text-primary ps-1"></i>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h6 class="card-title fw-bold text-truncate-2 mb-2" title="@item.TenKhoaHoc">
+                                        <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="text-dark text-decoration-none">@item.TenKhoaHoc</a>
+                                    </h6>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-person-video3 me-1"></i> GV ID: @item.MaGiangVien</small>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span>Tiến độ</span>
+                                            <span class="fw-bold text-primary">@item.TienDo%</span>
+                                        </div>
+                                        <div class="progress mb-3" style="height: 6px; border-radius: 10px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: @(item.TienDo)%" aria-valuenow="@item.TienDo" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="btn btn-primary w-100 btn-sm fw-bold py-2 shadow-sm border-0">
+                                            <i class="bi bi-play-circle me-1"></i> Tiếp tục học
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 bg-white rounded-3 shadow-sm border-0 my-3">
+                    <div class="mb-3 text-secondary" style="opacity: 0.2"><i class="bi bi-battery-charging" style="font-size: 4rem;"></i></div>
+                    <h6 class="text-muted mb-4">Bạn không có khóa học nào đang dang dở.</h6>
+                    <a href="/KhoaHoc" class="btn btn-outline-primary rounded-pill px-4"><i class="bi bi-search me-1"></i> Tìm khóa học mới</a>
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="new" role="tabpanel">
+            @if (listNew.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                    @foreach (var item in listNew)
+                    {
+                        <div class="col">
+                            <div class="card h-100 course-card shadow-sm">
+                                <div class="course-img-wrapper">
+                                    <img src="@item.AnhBia" class="course-img" alt="@item.TenKhoaHoc" onerror="this.src='/images/default-course.jpg'">
+                                    <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="play-overlay text-decoration-none">
+                                        <span class="btn btn-light rounded-circle shadow" style="width: 50px; height: 50px; display:flex; align-items:center; justify-content:center;">
+                                            <i class="bi bi-play-fill fs-3 text-primary ps-1"></i>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h6 class="card-title fw-bold text-truncate-2 mb-2" title="@item.TenKhoaHoc">
+                                        <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="text-dark text-decoration-none">@item.TenKhoaHoc</a>
+                                    </h6>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-person-video3 me-1"></i> GV ID: @item.MaGiangVien</small>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <div class="mb-4"></div> <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="btn btn-warning text-dark w-100 btn-sm fw-bold py-2 shadow-sm border-0">
+                                            <i class="bi bi-box-arrow-in-right me-1"></i> Vào học ngay
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 bg-white rounded-3 shadow-sm border-0 my-3">
+                    <div class="mb-3 text-secondary" style="opacity: 0.2"><i class="bi bi-stars" style="font-size: 4rem;"></i></div>
+                    <h6 class="text-muted mb-4">Bạn chưa đăng ký khóa học mới nào.</h6>
+                    <a href="/KhoaHoc" class="btn btn-outline-primary rounded-pill px-4"><i class="bi bi-search me-1"></i> Tìm khóa học mới</a>
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="done" role="tabpanel">
+            @if (listDone.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                    @foreach (var item in listDone)
+                    {
+                        <div class="col">
+                            <div class="card h-100 course-card shadow-sm">
+                                <div class="course-img-wrapper">
+                                    <img src="@item.AnhBia" class="course-img" alt="@item.TenKhoaHoc" onerror="this.src='/images/default-course.jpg'">
+                                    <div class="play-overlay d-flex flex-column text-white">
+                                        <i class="bi bi-check-circle-fill display-4 mb-2"></i>
+                                        <span class="fw-bold">Đã hoàn thành</span>
+                                    </div>
+                                </div>
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h6 class="card-title fw-bold text-truncate-2 mb-2" title="@item.TenKhoaHoc">
+                                        <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="text-dark text-decoration-none">@item.TenKhoaHoc</a>
+                                    </h6>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <small class="text-muted"><i class="bi bi-person-video3 me-1"></i> GV ID: @item.MaGiangVien</small>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span>Hoàn thành</span>
+                                            <span class="fw-bold text-success">100%</span>
+                                        </div>
+                                        <div class="progress mb-3" style="height: 6px; border-radius: 10px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                        </div>
+                                        <a href="/KhoaHoc/Hoc/@item.MaKhoaHoc" class="btn btn-success w-100 btn-sm fw-bold py-2 shadow-sm border-0">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i> Ôn tập lại
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 bg-white rounded-3 shadow-sm border-0 my-3">
+                    <div class="mb-3 text-secondary" style="opacity: 0.2"><i class="bi bi-trophy" style="font-size: 4rem;"></i></div>
+                    <h6 class="text-muted mb-4">Bạn chưa hoàn thành khóa học nào. Cố lên nhé!</h6>
+                    <a href="/KhoaHoc" class="btn btn-outline-primary rounded-pill px-4"><i class="bi bi-search me-1"></i> Tìm khóa học mới</a>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function switchTab(event, tabId) {
+        // 1. Ngăn chặn hành vi mặc định (tránh nhảy trang)
+        event.preventDefault();
+
+        // 2. Xóa class 'active' ở tất cả các nút Tab
+        var links = document.querySelectorAll('.nav-pills .nav-link');
+        links.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // 3. Thêm class 'active' cho nút vừa bấm
+        event.currentTarget.classList.add('active');
+
+        // 4. Ẩn tất cả các nội dung Tab (Tab Content)
+        var panes = document.querySelectorAll('.tab-content .tab-pane');
+        panes.forEach(pane => {
+            pane.classList.remove('show', 'active');
+            // Mẹo: Bootstrap 5 dùng 'show active', Bootstrap 4 cũng tương tự
+            // Đảm bảo ẩn hẳn đi
+            pane.style.display = 'none';
+        });
+
+        // 5. Hiện nội dung Tab tương ứng
+        var targetPane = document.getElementById(tabId);
+        if (targetPane) {
+            targetPane.classList.add('show', 'active');
+            targetPane.style.display = 'block'; // Force hiện
+
+            // Hiệu ứng Fade in nhẹ
+            targetPane.style.opacity = 0;
+            setTimeout(() => targetPane.style.opacity = 1, 50);
+        }
+    }
+</script>

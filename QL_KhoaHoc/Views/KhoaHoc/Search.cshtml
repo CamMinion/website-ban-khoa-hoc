@@ -1,0 +1,105 @@
+﻿@model List<QL_KhoaHoc.Models.KhoaHoc>
+
+@{
+    ViewData["Title"] = "Kết quả tìm kiếm";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            @* <h3>Kết quả tìm kiếm cho: <span class="text-primary">"@ViewBag.Keyword"</span></h3> *@
+            <p class="text-muted">Tìm thấy @(Model?.Count ?? 0) khóa học phù hợp.</p>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var item in Model)
+            {
+                // [LOGIC MỚI] Kiểm tra Video
+                bool isVideo = !string.IsNullOrEmpty(item.AnhBia) &&
+                (item.AnhBia.EndsWith(".mp4") || item.AnhBia.Contains("/video/upload/"));
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 transition-hover">
+                        <div class="position-relative media-wrapper">
+                            <a href="/KhoaHoc/ChitietKH?id=@item.MaKhoaHoc" class="d-block text-decoration-none">
+                                @if (isVideo)
+                                {
+                                    <video src="@item.AnhBia" class="card-img-top media-content" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                                    <span class="badge bg-dark bg-opacity-75 position-absolute top-50 start-50 translate-middle pointer-events-none">
+                                        <i class="bi bi-play-circle fs-1"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <img src="@(string.IsNullOrEmpty(item.AnhBia) ? "/images/default-course.jpg" : item.AnhBia)"
+                                         class="card-img-top media-content" alt="@item.TenKhoaHoc">
+                                }
+                            </a>
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate">
+                                <a href="/KhoaHoc/ChitietKH?id=@item.MaKhoaHoc" class="text-decoration-none text-dark fw-bold">
+                                    @item.TenKhoaHoc
+                                </a>
+                            </h5>
+                            <p class="card-text small text-muted text-truncate">@item.MoTaNgan</p>
+
+                            <div class="mt-auto d-flex justify-content-between align-items-center mt-3">
+                                <span class="fw-bold text-primary fs-5">
+                                    @if (item.GiaTien == 0)
+                                    {
+                                        <span>Miễn phí</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@((item.GiaTien ?? 0).ToString("#,##0")) đ</span>
+                                    }
+                                </span>
+                                <a href="/KhoaHoc/ChitietKH?id=@item.MaKhoaHoc" class="btn btn-sm btn-outline-primary rounded-pill px-3">Xem ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" alt="Not found" style="width: 100px; opacity: 0.5">
+            <h4 class="mt-3 text-muted">Không tìm thấy khóa học nào.</h4>
+            <p>Hãy thử tìm với từ khóa khác.</p>
+            <a href="/" class="btn btn-primary mt-2">Về trang chủ</a>
+        </div>
+    }
+</div>
+
+<style>
+    /* CSS đồng bộ kích thước ảnh và video */
+    .media-content {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+        border-top-left-radius: 0.25rem; /* Bo góc trên theo card của Bootstrap */
+        border-top-right-radius: 0.25rem;
+        background-color: #000;
+    }
+
+    .transition-hover {
+        transition: transform 0.2s;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+        }
+
+    .pointer-events-none {
+        pointer-events: none;
+    }
+</style>

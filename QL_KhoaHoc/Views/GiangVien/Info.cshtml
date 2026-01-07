@@ -1,0 +1,128 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model QL_KhoaHoc.Models.GiangVienPublicViewModel
+@{
+    ViewData["Title"] = "Giảng viên " + Model.HoTen;
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml"; // Dùng Layout của người dùng
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm text-center p-4 sticky-top" style="top: 90px; z-index: 1;">
+                <div class="mb-3">
+                    <img src="@(string.IsNullOrEmpty(Model.AnhDaiDien) ? "https://via.placeholder.com/200" : Model.AnhDaiDien)"
+                         class="rounded-circle img-thumbnail"
+                         style="width: 180px; height: 180px; object-fit: cover;">
+                </div>
+                <h6 class="text-uppercase text-muted small fw-bold mb-1">Giảng viên</h6>
+                <h3 class="fw-bold mb-2">@Model.HoTen</h3>
+                <p class="text-primary fw-bold mb-3">@Model.ChucDanh</p>
+
+                <div class="d-flex justify-content-center gap-3 mb-4 text-center">
+                    <div>
+                        <h5 class="fw-bold mb-0">@Model.TongHocVien</h5>
+                        <small class="text-muted">Học viên</small>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">@Model.KhoaHocs?.Count</h5>
+                        <small class="text-muted">Khóa học</small>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">@Model.TongDanhGia</h5>
+                        <small class="text-muted">Đánh giá</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2">
+                    @if (!string.IsNullOrEmpty(Model.Website))
+                    {
+                        <a href="@Model.Website" target="_blank" class="btn btn-outline-secondary btn-sm rounded-circle" style="width: 38px; height: 38px;"><i class="fas fa-globe"></i></a>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Facebook))
+                    {
+                        <a href="@Model.Facebook" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle" style="width: 38px; height: 38px;"><i class="fab fa-facebook-f"></i></a>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Youtube))
+                    {
+                        <a href="@Model.Youtube" target="_blank" class="btn btn-outline-danger btn-sm rounded-circle" style="width: 38px; height: 38px;"><i class="fab fa-youtube"></i></a>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.LinkedIn))
+                    {
+                        <a href="@Model.LinkedIn" target="_blank" class="btn btn-outline-info btn-sm rounded-circle" style="width: 38px; height: 38px;"><i class="fab fa-linkedin-in"></i></a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="mb-5">
+                <h4 class="fw-bold mb-3">Giới thiệu</h4>
+                <div class="text-muted" style="white-space: pre-line; line-height: 1.8;">
+                    @(string.IsNullOrEmpty(Model.TieuSu) ? "Giảng viên chưa cập nhật tiểu sử." : Model.TieuSu)
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="mt-5">
+                <h4 class="fw-bold mb-4">Các khóa học của @Model.HoTen</h4>
+
+                @if (Model.KhoaHocs != null && Model.KhoaHocs.Any())
+                {
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        @foreach (var kh in Model.KhoaHocs)
+                        {
+                            // Kiểm tra Video/Ảnh (Sử dụng lại logic hiển thị)
+                            bool isVideo = !string.IsNullOrEmpty(kh.AnhBia) && (kh.AnhBia.EndsWith(".mp4") || kh.AnhBia.Contains("/video/upload/"));
+
+                            <div class="col">
+                                <div class="card h-100 shadow-sm border-0 hover-shadow transition">
+                                    <div class="position-relative overflow-hidden rounded-top">
+                                        <a href="/KhoaHoc/ChiTietKH/@kh.MaKhoaHoc">
+                                            @if (isVideo)
+                                            {
+                                                <video src="@kh.AnhBia" class="card-img-top" style="height: 180px; object-fit: cover;" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                                            }
+                                            else
+                                            {
+                                                <img src="@(string.IsNullOrEmpty(kh.AnhBia) ? "https://via.placeholder.com/300x200" : kh.AnhBia)" class="card-img-top" style="height: 180px; object-fit: cover;" alt="@kh.TenKhoaHoc">
+                                            }
+                                        </a>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-title fw-bold text-truncate">
+                                            <a href="/KhoaHoc/ChiTietKH/@kh.MaKhoaHoc" class="text-decoration-none text-dark">@kh.TenKhoaHoc</a>
+                                        </h6>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <span class="text-warning small"><i class="fas fa-star"></i> @kh.SoDanhGia</span>
+                                            <span class="text-secondary small"><i class="fas fa-user"></i> @kh.SoDangKy học viên</span>
+                                        </div>
+                                        <div class="mt-2 text-end fw-bold text-danger">
+                                            @string.Format("{0:N0} đ", kh.GiaTien)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Giảng viên này chưa có khóa học nào được xuất bản.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        transition: all 0.3s;
+    }
+</style>

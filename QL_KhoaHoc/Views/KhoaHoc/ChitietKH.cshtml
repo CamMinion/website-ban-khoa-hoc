@@ -1,0 +1,309 @@
+﻿@model QL_KhoaHoc.Models.KhoaHocCreateModel
+@{
+    ViewBag.Title = "Chi tiết khóa học";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<div class="content-wrapper-white mt-5">
+    @* Hiển thị thông báo lỗi/thành công *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row">
+        <div class="col-md-5">
+            @{
+                var url = Model.AnhBia;
+                bool isVideo = false;
+
+                if (!string.IsNullOrEmpty(url))
+                {
+                    // Logic kiểm tra xem URL có phải là video không:
+                    // 1. Kiểm tra đuôi file (.mp4, .webm...)
+                    // 2. Kiểm tra đặc trưng của Cloudinary video (/video/upload/)
+                    isVideo = url.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
+                    url.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ||
+                    url.EndsWith(".mov", StringComparison.OrdinalIgnoreCase) ||
+                    url.Contains("/video/upload/");
+                }
+            }
+
+            @if (!string.IsNullOrEmpty(url))
+            {
+                if (isVideo)
+                {
+                    <div class="ratio ratio-16x9 rounded shadow-sm border overflow-hidden">
+                        <video controls controlsList="nodownload" style="object-fit: cover;">
+                            <source src="@url">
+                            Trình duyệt của bạn không hỗ trợ phát video.
+                        </video>
+                    </div>
+                    <p class="text-center text-muted small mt-2">
+                        <i class="bi bi-play-circle"></i> Xem video giới thiệu khóa học
+                    </p>
+                }
+                else
+                {
+                    <img src="@url" alt="@Model.TenKhoaHoc" class="img-fluid rounded shadow-sm border" style="width: 100%; object-fit: cover;" />
+                }
+            }
+            else
+            {
+                <img src="https://via.placeholder.com/800x450?text=No+Preview" class="img-fluid rounded shadow-sm border" />
+            }
+        </div>
+
+        <div class="col-md-7">
+            <h2 class="fw-bold mb-3">@Model.TenKhoaHoc</h2>
+
+            <p class="text-muted mb-2">
+                <strong>Chủ đề:</strong> @Model.MaDanhMuc
+            </p>
+
+            <p class="text-muted mb-2">
+                <strong>Giảng viên (ID):</strong> @Model.MaGiangVien
+            </p>
+
+            <p class="text-muted mb-2">
+                <strong>Chủ đề:</strong> <span class="text-primary">@Model.TenDanhMuc</span>
+            </p>
+            <p class="text-muted mb-2">
+                <strong>Giảng viên:</strong>
+                @* Tạo liên kết đến Action Info của GiangVienController, truyền vào MaGiangVien *@
+                <a href="/GiangVien/Info/@Model.MaGiangVien" class="fw-bold text-decoration-none text-primary hover-link">
+                    @Model.TenGiangVien
+                </a>
+            </p>
+
+            <p class="text-muted mb-2">
+                <strong>Ngày phát hành:</strong>
+                @(Model.NgayPhatHanh.HasValue ? Model.NgayPhatHanh.Value.ToString("dd/MM/yyyy") : "Chưa phát hành")
+            </p>
+
+            <p class="fs-4 fw-semibold text-danger mb-3">
+                @String.Format("{0:N0} đ", Model.GiaTien)
+            </p>
+
+            <div class="mb-3">
+                <span class="badge bg-success me-2">Đã phát hành: @(Model.DaPhatHanh ? "Có" : "Chưa")</span>
+            </div>
+
+            <div class="d-flex align-items-center mb-4">
+                <span class="me-3"><i class="bi bi-star-fill text-warning"></i> @Model.SoDanhGia đánh giá</span>
+                <span><i class="bi bi-people-fill text-primary"></i> @Model.SoDangKy lượt đăng ký</span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <form asp-action="DangKyKhoaHoc" method="post" class="d-inline">
+                    <input type="hidden" name="maKH" value="@Model.MaKhoaHoc" />
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-lightning-charge-fill"></i> Đăng ký ngay
+                    </button>
+                </form>
+
+                <form asp-action="ThemVaoGioHang" method="post" class="d-inline">
+                    <input type="hidden" name="maKH" value="@Model.MaKhoaHoc" />
+                    <button type="submit" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5" />
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="fw-bold mb-3">Giới thiệu khóa học</h4>
+            <div class="card p-4 shadow-sm mb-5 border-0 bg-light">
+                <p style="white-space: pre-line; margin-bottom: 0;">@Model.MoTaNgan</p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold">Nội dung bài học</h4>
+                <span class="text-muted small">
+                    @if (Model.ChuongMucs != null)
+                    {
+                        <span>Tổng số: @Model.ChuongMucs.Count chương</span>
+                    }
+                </span>
+            </div>
+
+            <div class="accordion" id="accordionCourseContent">
+                @if (Model.ChuongMucs != null && Model.ChuongMucs.Any())
+                {
+                    foreach (var chuong in Model.ChuongMucs.OrderBy(c => c.ThuTu))
+                    {
+                        <div class="accordion-item mb-2 border rounded overflow-hidden">
+                            <h2 class="accordion-header" id="heading-@chuong.MaCM">
+                                <button class="accordion-button fw-bold bg-white text-dark shadow-none @(chuong.ThuTu == 1 ? "" : "collapsed")"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-@chuong.MaCM"
+                                        aria-expanded="@(chuong.ThuTu == 1 ? "true" : "false")"
+                                        aria-controls="collapse-@chuong.MaCM">
+                                    Chương @chuong.ThuTu: @chuong.TenChuong
+                                </button>
+                            </h2>
+                            <div id="collapse-@chuong.MaCM"
+                                 class="accordion-collapse collapse @(chuong.ThuTu == 1 ? "show" : "")"
+                                 aria-labelledby="heading-@chuong.MaCM">
+                                <div class="accordion-body p-0">
+                                    <div class="list-group list-group-flush">
+
+                                        @* Hiển thị Bài giảng *@
+                                        @if (chuong.BaiGiangs != null)
+                                        {
+                                            foreach (var bg in chuong.BaiGiangs.OrderBy(b => b.ThuTu))
+                                            {
+                                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-play-circle-fill text-primary me-3 fs-5"></i>
+                                                        <span>@bg.ThuTu. Bài giảng (Video)</span>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(bg.Video))
+                                                    {
+                                                        <span class="badge bg-light text-primary border border-primary">Xem trước</span>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+
+                                        @* Hiển thị Trắc nghiệm *@
+                                        @if (chuong.TracNghiems != null)
+                                        {
+                                            foreach (var tn in chuong.TracNghiems.OrderBy(t => t.ThuTu))
+                                            {
+                                                <div class="list-group-item d-flex align-items-center py-3 border-0 border-bottom bg-light bg-opacity-25">
+                                                    <i class="bi bi-question-octagon-fill text-warning me-3 fs-5"></i>
+                                                    <span>@tn.TieuDe (Trắc nghiệm)</span>
+                                                </div>
+                                            }
+                                        }
+
+                                        @* Hiển thị Bài tập *@
+                                        @if (chuong.BaiTaps != null)
+                                        {
+                                            foreach (var bt in chuong.BaiTaps.OrderBy(b => b.ThuTu))
+                                            {
+                                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-pencil-square text-success me-3 fs-5"></i>
+                                                        <span>@bt.TieuDe (Bài tập)</span>
+                                                    </div>
+                                                    @if (bt.ThoiLuong > 0)
+                                                    {
+                                                        <span class="text-muted small">@bt.ThoiLuong phút</span>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+
+                                        @* Xử lý khi chương trống *@
+                                        @if ((chuong.BaiGiangs == null || !chuong.BaiGiangs.Any()) &&
+                                       (chuong.TracNghiems == null || !chuong.TracNghiems.Any()) &&
+                                       (chuong.BaiTaps == null || !chuong.BaiTaps.Any()))
+                                        {
+                                            <div class="p-3 text-muted fst-italic text-center small">Chưa có nội dung</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info text-center">Nội dung khóa học đang được cập nhật.</div>
+                }
+            </div>
+
+            @* --- ĐOẠN CODE HIỂN THỊ ĐÁNH GIÁ --- *@
+            <hr class="my-5" />
+            <h4 class="fw-bold mb-4">Đánh giá từ học viên (@(Model.DanhSachDanhGia?.Count ?? 0))</h4>
+
+            @if (Model.DanhSachDanhGia != null && Model.DanhSachDanhGia.Any())
+            {
+                <div class="row">
+                    @foreach (var dg in Model.DanhSachDanhGia)
+                    {
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm h-100" style="background-color: #f8f9fa;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center">
+                                            @* Avatar giả lập bằng chữ cái đầu *@
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 40px; height: 40px; font-weight: bold;">
+                                                @(dg.TenHocVien?.Substring(0, 1).ToUpper() ?? "U")
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">@dg.TenHocVien</h6>
+                                                <small class="text-muted">@dg.NgayDanhGia.ToString("dd/MM/yyyy")</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-warning">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= dg.SoSao) { <i class="bi bi-star-fill"></i> }
+                                                else { <i class="bi bi-star"></i> }
+                                            }
+                                        </div>
+                                    </div>
+                                    <p class="card-text mt-3">@dg.NoiDung</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-chat-square-dots fs-1 d-block mb-2"></i>
+                    <p>Chưa có đánh giá nào cho khóa học này.</p>
+                </div>
+            }
+
+
+
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f9f9f9;
+    }
+
+    .content-wrapper-white {
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+    }
+    /* Tùy chỉnh Accordion */
+    .accordion-button:not(.collapsed) {
+        color: #000;
+        background-color: #f8f9fa;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+
+    .list-group-item {
+        font-size: 0.95rem;
+    }
+
+        .list-group-item:hover {
+            background-color: #fafafa;
+        }
+</style>

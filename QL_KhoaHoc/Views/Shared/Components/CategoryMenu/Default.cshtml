@@ -1,0 +1,104 @@
+﻿@using QL_KhoaHoc.Models
+@model List<DanhMuc>
+
+<li class="nav-item dropdown dropdown-hover">
+    <a class="nav-link dropdown-toggle fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-grid-3x3-gap me-1"></i> Thể loại
+    </a>
+
+    <ul class="dropdown-menu shadow border-0 mt-0" aria-labelledby="navbarDropdown">
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var dmCha in Model)
+            {
+                <li class="dropend position-relative">
+                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center py-2" href="#" data-bs-toggle="dropdown">
+                        <span>@dmCha.TenDanhMuc</span>
+                        @if (dmCha.DanhMucCons != null && dmCha.DanhMucCons.Count > 0)
+                        {
+                            <i class="bi bi-chevron-right small text-muted ms-2" style="font-size: 0.8em;"></i>
+                        }
+                    </a>
+
+                    @if (dmCha.DanhMucCons != null && dmCha.DanhMucCons.Count > 0)
+                    {
+                        <ul class="dropdown-menu submenu shadow border-0">
+                            @foreach (var dmCon in dmCha.DanhMucCons)
+                            {
+                                <li>
+                                    <a class="dropdown-item py-2" href="/KhoaHoc/Search?category=@dmCon.MaDanhMucCon">
+                                        @dmCon.TenDanhMucCon
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+        }
+        else
+        {
+            <li><span class="dropdown-item text-muted">Đang tải danh mục...</span></li>
+        }
+    </ul>
+</li>
+
+<style>
+    /* Trên màn hình máy tính (Desktop) */
+    @@media (min-width: 992px) {
+        /* Rê chuột vào Thể loại -> Hiện menu cha */
+        .dropdown-hover:hover > .dropdown-menu
+
+    {
+        display: block;
+        margin-top: 0;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    /* Rê chuột vào Menu cha -> Hiện menu con sang bên phải */
+    .dropend:hover > .submenu {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 100%; /* Đẩy sang phải */
+        margin-top: -5px;
+        margin-left: 0px;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    }
+
+    /* Hiệu ứng hiện dần */
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Style cho Submenu */
+    .submenu {
+        display: none; /* Mặc định ẩn */
+        min-width: 220px;
+        padding: 8px 0;
+    }
+
+    /* Hover item đẹp hơn */
+    .dropdown-item:hover {
+        background-color: #f0f0f0;
+        color: #5624d0; /* Màu tím Udemy */
+    }
+
+    .dropdown-item {
+        font-size: 14px;
+        color: #2d2f31;
+    }
+</style>

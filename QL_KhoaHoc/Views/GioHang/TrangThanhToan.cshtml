@@ -1,0 +1,72 @@
+﻿@* Đổi model thành ViewModel mới *@
+@model QL_KhoaHoc.Models.ThanhToanViewModel
+
+@{
+    ViewData["Title"] = "Trang Thanh Toán";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<h2>Xác nhận thanh toán cho Hóa đơn: #@Model.HoaDon.MaHD</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Chi tiết đơn hàng</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-4">Mã hóa đơn:</dt>
+            <dd class="col-sm-8">@Model.HoaDon.MaHD</dd>
+
+            <dt class="col-sm-4">Ngày tạo:</dt>
+            <dd class="col-sm-8">@Model.HoaDon.NgayTao.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt class="col-sm-4">Tổng tiền:</dt>
+            <dd class="col-sm-8"><strong>@Model.HoaDon.ThanhTien.ToString("N0") VNĐ</strong></dd>
+        </dl>
+
+        <hr />
+
+        @* Chúng ta vẫn giữ form "Xác nhận" này. 
+        Sau khi người dùng quét QR và chuyển khoản xong,
+        họ sẽ nhấn nút này để báo cho hệ thống biết là họ đã thanh toán.
+        *@
+        <h4>Hoàn tất thanh toán</h4>
+        <p>Sau khi hoàn tất chuyển khoản, vui lòng nhấn "Xác nhận" để chúng tôi kiểm tra.</p>
+
+        <form asp-action="XacNhanThanhToan" method="post">
+            <input type="hidden" name="maHD" value="@Model.HoaDon.MaHD" />
+            <button type="submit" class="btn btn-success">
+                Tôi đã thanh toán, Xác nhận
+            </button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+        {
+            <div class="alert alert-danger mt-3">@TempData["ErrorMessage"]</div>
+        }
+    </div>
+
+    <div class="col-md-6">
+        <h4>Quét mã VietQR để thanh toán</h4>
+        <hr />
+
+        @* HIỂN THỊ QR CODE HOẶC LỖI *@
+        @if (!string.IsNullOrEmpty(Model.QrDataURL))
+        {
+            <div style="text-align: center;">
+                <img src="@Model.QrDataURL" alt="Mã QR Thanh toán" style="max-width: 300px;" />
+                <p class="mt-2">
+                    Nội dung: <strong>Thanh toan HD @Model.HoaDon.MaHD</strong><br />
+                    Số tiền: <strong>@Model.HoaDon.ThanhTien.ToString("N0") VNĐ</strong>
+                </p>
+                <p><i>(Mã QR đã bao gồm số tiền và nội dung)</i></p>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <strong>Không thể tạo mã QR:</strong>
+                <p>@Model.ErrorMessage</p>
+            </div>
+        }
+    </div>
+</div>

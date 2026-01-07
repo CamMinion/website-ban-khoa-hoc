@@ -1,0 +1,2422 @@
+﻿@* @using Newtonsoft.Json *@
+@* @model QL_KhoaHoc.Models.KhoaHocCreateModel *@
+@* @{ *@
+@*     Layout = null; *@
+@*     bool isPreview = ViewBag.IsPreview ?? false; *@
+@*     bool isAuthor = ViewBag.IsAuthor ?? false; *@
+@*     int currentUserId = ViewBag.CurrentUserId ?? 0; *@
+@*     var completedList = ViewBag.CompletedItems as List<dynamic> ?? new List<dynamic>(); *@
+@* } *@
+
+@* <!DOCTYPE html> *@
+@* <html lang="vi"> *@
+@* <head> *@
+@*     <meta charset="utf-8" /> *@
+@*     <title>@Model.TenKhoaHoc - Hệ thống học tập</title> *@
+@*     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" /> *@
+@*     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" /> *@
+@*     <style> *@
+@*         body { *@
+@*             overflow: hidden; *@
+@*             height: 100vh; *@
+@*             display: flex; *@
+@*             flex-direction: column; *@
+@*             background: #f8f9fa; *@
+@*             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; *@
+@*         } *@
+
+@*         /* --- 1. Top Bar --- */ *@
+@*         .top-bar { *@
+@*             height: 64px; *@
+@*             background: #2d3e50; *@
+@*             color: white; *@
+@*             display: flex; *@
+@*             align-items: center; *@
+@*             padding: 0 20px; *@
+@*             justify-content: space-between; *@
+@*             box-shadow: 0 2px 5px rgba(0,0,0,0.1); *@
+@*             z-index: 1000; *@
+@*         } *@
+
+@*         .back-btn { *@
+@*             color: #b4bac2; *@
+@*             text-decoration: none; *@
+@*             font-size: 14px; *@
+@*             display: flex; *@
+@*             align-items: center; *@
+@*             transition: 0.2s; *@
+@*         } *@
+
+@*             .back-btn:hover { *@
+@*                 color: #fff; *@
+@*                 text-decoration: none; *@
+@*             } *@
+
+@*         .course-title { *@
+@*             font-weight: 600; *@
+@*             font-size: 16px; *@
+@*             margin-left: 15px; *@
+@*             border-left: 1px solid #555; *@
+@*             padding-left: 15px; *@
+@*         } *@
+
+@*         /* --- 2. Layout --- */ *@
+@*         .main-container { *@
+@*             flex: 1; *@
+@*             display: flex; *@
+@*             overflow: hidden; *@
+@*         } *@
+
+@*         /* --- 3. Sidebar (Right) --- */ *@
+@*         .curriculum-sidebar { *@
+@*             flex: 0 0 350px; *@
+@*             background: #fff; *@
+@*             border-left: 1px solid #dee2e6; *@
+@*             overflow-y: auto; *@
+@*             display: flex; *@
+@*             flex-direction: column; *@
+@*         } *@
+
+@*         .chapter-title { *@
+@*             background: #f1f3f5; *@
+@*             padding: 15px 20px; *@
+@*             font-weight: 700; *@
+@*             border-bottom: 1px solid #dee2e6; *@
+@*             font-size: 14px; *@
+@*             color: #343a40; *@
+@*         } *@
+
+@*         .lesson-item { *@
+@*             padding: 12px 20px; *@
+@*             border-bottom: 1px solid #f1f1f1; *@
+@*             cursor: pointer; *@
+@*             display: flex; *@
+@*             align-items: flex-start; *@
+@*             transition: 0.2s; *@
+@*         } *@
+
+@*             .lesson-item:hover { *@
+@*                 background-color: #f8f9fa; *@
+@*             } *@
+
+@*             .lesson-item.active { *@
+@*                 background-color: #e3f2fd; *@
+@*                 border-left: 4px solid #007bff; *@
+@*                 padding-left: 16px; *@
+@*             } *@
+
+@*         .check-circle { *@
+@*             width: 20px; *@
+@*             height: 20px; *@
+@*             border: 2px solid #adb5bd; *@
+@*             border-radius: 50%; *@
+@*             margin-right: 12px; *@
+@*             margin-top: 2px; *@
+@*             display: flex; *@
+@*             align-items: center; *@
+@*             justify-content: center; *@
+@*             flex-shrink: 0; *@
+@*             transition: 0.2s; *@
+@*         } *@
+
+@*             .check-circle.completed { *@
+@*                 border-color: #28a745; *@
+@*                 background: #28a745; *@
+@*                 color: white; *@
+@*             } *@
+
+@*         .lesson-info { *@
+@*             flex: 1; *@
+@*         } *@
+
+@*         .lesson-title-text { *@
+@*             font-size: 14px; *@
+@*             font-weight: 500; *@
+@*             color: #495057; *@
+@*             display: block; *@
+@*             margin-bottom: 2px; *@
+@*         } *@
+
+@*         .lesson-meta { *@
+@*             font-size: 12px; *@
+@*             color: #868e96; *@
+@*         } *@
+
+@*         .lesson-icon { *@
+@*             margin-right: 5px; *@
+@*         } *@
+
+@*         /* --- 4. Content Area (Left) --- */ *@
+@*         .content-area { *@
+@*             flex: 1; *@
+@*             background: #fff; *@
+@*             overflow-y: auto; *@
+@*             position: relative; *@
+@*             display: flex; *@
+@*             flex-direction: column; *@
+@*         } *@
+
+@*         .video-wrapper { *@
+@*             background: #000; *@
+@*             width: 100%; *@
+@*             display: flex; *@
+@*             justify-content: center; *@
+@*             align-items: center; *@
+@*             min-height: 400px; *@
+@*         } *@
+
+@*         .content-padding { *@
+@*             padding: 40px; *@
+@*             max-width: 900px; *@
+@*             margin: 0 auto; *@
+@*             width: 100%; *@
+@*         } *@
+
+@*         /* --- 5. Quiz & Assignment Styles --- */ *@
+@*         .question-card { *@
+@*             background: #fff; *@
+@*             border: 1px solid #e9ecef; *@
+@*             border-radius: 8px; *@
+@*             padding: 20px; *@
+@*             margin-bottom: 20px; *@
+@*             box-shadow: 0 2px 4px rgba(0,0,0,0.03); *@
+@*         } *@
+
+@*         .question-text { *@
+@*             font-weight: 600; *@
+@*             margin-bottom: 15px; *@
+@*             font-size: 16px; *@
+@*             color: #212529; *@
+@*         } *@
+
+@*         .option-item { *@
+@*             display: block; *@
+@*             margin-bottom: 10px; *@
+@*             padding: 12px 15px; *@
+@*             border: 1px solid #dee2e6; *@
+@*             border-radius: 6px; *@
+@*             cursor: pointer; *@
+@*             transition: 0.2s; *@
+@*             font-size: 15px; *@
+@*         } *@
+
+@*             .option-item:hover { *@
+@*                 background: #f8f9fa; *@
+@*                 border-color: #ced4da; *@
+@*             } *@
+
+@*             .option-item input { *@
+@*                 margin-right: 10px; *@
+@*                 transform: scale(1.2); *@
+@*             } *@
+
+@*             .option-item.correct { *@
+@*                 background-color: #d4edda; *@
+@*                 border-color: #c3e6cb; *@
+@*                 color: #155724; *@
+@*             } *@
+
+@*             .option-item.incorrect { *@
+@*                 background-color: #f8d7da; *@
+@*                 border-color: #f5c6cb; *@
+@*                 color: #721c24; *@
+@*             } *@
+
+@*         .explanation-box { *@
+@*             margin-top: 12px; *@
+@*             padding: 12px 15px; *@
+@*             background: #fff3cd; *@
+@*             border-left: 4px solid #ffc107; *@
+@*             border-radius: 4px; *@
+@*             color: #856404; *@
+@*             font-size: 14px; *@
+@*             display: none; *@
+@*         } *@
+
+@*         .btn-submit-quiz { *@
+@*             margin-top: 20px; *@
+@*             width: 100%; *@
+@*             padding: 12px; *@
+@*             font-size: 16px; *@
+@*             font-weight: 600; *@
+@*             text-transform: uppercase; *@
+@*             letter-spacing: 0.5px; *@
+@*         } *@
+
+@*         .score-board { *@
+@*             text-align: center; *@
+@*             margin-bottom: 25px; *@
+@*             padding: 20px; *@
+@*             background: #e9ecef; *@
+@*             border-radius: 8px; *@
+@*             font-size: 18px; *@
+@*             display: none; *@
+@*         } *@
+
+@*         .model-answer { *@
+@*             background: #d1ecf1; *@
+@*             padding: 15px; *@
+@*             border-radius: 6px; *@
+@*             margin-top: 15px; *@
+@*             color: #0c5460; *@
+@*             border: 1px solid #bee5eb; *@
+@*             display: none; *@
+@*             font-size: 15px; *@
+@*         } *@
+@*     </style> *@
+@* </head> *@
+@* <body> *@
+
+@*     <div class="top-bar"> *@
+@*         <div class="d-flex align-items-center"> *@
+@*             @if (isAuthor) *@
+@*             { *@
+@*                 <a href="@Url.Action("QuanLyBanNhap", "KhoaHoc")" class="back-btn"><i class="fas fa-arrow-left mr-2"></i> Về trang quản lý</a> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <a href="@Url.Action("Index", "Home")" class="back-btn"><i class="fas fa-arrow-left mr-2"></i> Trang chủ</a> *@
+@*             } *@
+@*             <span class="course-title">@Model.TenKhoaHoc</span> *@
+@*             @if (isPreview) *@
+@*             { *@
+@*                 <span class="badge badge-warning ml-2 text-dark">Chế độ xem trước</span> *@
+@*             } *@
+@*         </div> *@
+
+@*         <div class="d-flex align-items-center"> *@
+@*             @if (isAuthor) *@
+@*             { *@
+@*                 <button class="btn btn-sm btn-danger mr-3" onclick="resetProgress()"> *@
+@*                     <i class="fas fa-trash-restore mr-1"></i> Reset Tiến Độ Test *@
+@*                 </button> *@
+@*             } *@
+@*             <div class="text-right"> *@
+@*                 <div style="font-size: 12px; opacity: 0.8;">Tiến độ</div> *@
+@*                 <div style="font-weight: bold;"> <span id="completed-count">0</span>/@ViewBag.TotalItems bài</div> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+
+@*     <div class="main-container"> *@
+@*         <div class="content-area" id="content-display"> *@
+@*             <div class="video-wrapper" style="height: 100%; background: #2d3e50;"> *@
+@*                 <div class="text-white text-center"> *@
+@*                     <i class="fas fa-play-circle mb-3" style="font-size: 64px; opacity: 0.5;"></i> *@
+@*                     <h3>Sẵn sàng học?</h3> *@
+@*                     <p class="text-muted">Chọn bài học đầu tiên ở menu bên phải để bắt đầu.</p> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+
+@*         <div class="curriculum-sidebar"> *@
+@*             @{ *@
+@*                 // Dictionary để lưu toàn bộ data xuống Client *@
+@*                 var lessonDataMap = new Dictionary<string, object>(); *@
+@*                 int totalItems = 0; *@
+@*                 int completedCount = 0; *@
+@*             } *@
+
+@*             @if (Model.ChuongMucs != null) *@
+@*             { *@
+@*                 foreach (var chuong in Model.ChuongMucs.OrderBy(c => c.ThuTu)) *@
+@*                 { *@
+@*                     <div class="chapter-title">@chuong.TenChuong</div> *@
+
+@*                     <div class="chapter-content"> *@
+@*                         @{ *@
+@*                             var mixedList = new List<dynamic>(); *@
+
+@*                             if (chuong.BaiGiangs != null) *@
+@*                                 mixedList.AddRange(chuong.BaiGiangs.Select(x => new { Type = "BG", Id = x.MaBG, Title = x.BaiViet, Order = x.ThuTu, Url = x.Video, Data = x })); *@
+
+@*                             if (chuong.TracNghiems != null) *@
+@*                                 mixedList.AddRange(chuong.TracNghiems.Select(x => new { Type = "TN", Id = x.MaTN, Title = x.TieuDe, Order = x.ThuTu, Url = "", Data = x })); *@
+
+@*                             if (chuong.BaiTaps != null) *@
+@*                                 mixedList.AddRange(chuong.BaiTaps.Select(x => new { Type = "BT", Id = x.MaBT, Title = x.TieuDe, Order = x.ThuTu, Url = "", Data = x })); *@
+
+@*                             var sortedList = mixedList.OrderBy(x => x.Order).ToList(); *@
+@*                         } *@
+
+@*                         @foreach (var item in sortedList) *@
+@*                         { *@
+@*                             totalItems++; *@
+@*                             string key = $"{item.Type}_{item.Id}"; *@
+@*                             lessonDataMap[key] = item.Data; *@
+
+@*                             // Check completed *@
+@*                             bool isDone = false; *@
+@*                             if (completedList != null) *@
+@*                             { *@
+@*                                 foreach (var c in completedList) *@
+@*                                 { *@
+@*                                     if (c.Type == item.Type && c.Id == item.Id) { isDone = true; completedCount++; break; } *@
+@*                                 } *@
+@*                             } *@
+
+@*                             string typeIcon = "fa-file-alt"; *@
+@*                             string typeName = "Bài đọc"; *@
+@*                             if (item.Type == "BG" && !string.IsNullOrEmpty(item.Url)) { typeIcon = "fa-play-circle"; typeName = "Video"; } *@
+@*                             if (item.Type == "TN") { typeIcon = "fa-question-circle"; typeName = "Trắc nghiệm"; } *@
+@*                             if (item.Type == "BT") { typeIcon = "fa-pencil-alt"; typeName = "Bài tập"; } *@
+
+@*                             <div class="lesson-item" onclick="selectLesson('@item.Type', @item.Id, this)"> *@
+@*                                 <div class="check-circle @(isDone ? "completed" : "")" id="check-@item.Type-@item.Id"> *@
+@*                                     <i class="fas fa-check" style="font-size: 10px; @(isDone ? "" : "display:none")"></i> *@
+@*                                 </div> *@
+
+@*                                 <div class="lesson-info"> *@
+@*                                     <span class="lesson-title-text">@item.Title</span> *@
+@*                                     <span class="lesson-meta"><i class="fas @typeIcon lesson-icon"></i> @typeName</span> *@
+@*                                 </div> *@
+@*                             </div> *@
+@*                         } *@
+@*                     </div> *@
+@*                 } *@
+@*             } *@
+@*         </div> *@
+@*     </div> *@
+
+@*     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> *@
+@*     <script> *@
+@*         // 1. INIT DATA *@
+@*         const currentUserId = @currentUserId; *@
+@*         const maKH = @Model.MaKhoaHoc; *@
+@*         const isPreview = @(isPreview.ToString().ToLower()); *@
+@*         const lessonData = @Html.Raw(JsonConvert.SerializeObject(lessonDataMap)); *@
+
+@*         // Update initial counter *@
+@*         $('#completed-count').text(@completedCount); *@
+@*         // (ViewBag.TotalItems cần được gán trong controller hoặc tính ở đây, tạm thời dùng JS update sau) *@
+
+@*         // 2. MAIN NAVIGATION *@
+@*         function selectLesson(type, id, element) { *@
+@*             $('.lesson-item').removeClass('active'); *@
+@*             $(element).addClass('active'); *@
+
+@*             const key = `${type}_${id}`; *@
+@*             const data = lessonData[key]; *@
+@*             const displayArea = $('#content-display'); *@
+
+@*             displayArea.empty(); *@
+
+@*             if (type === 'BG') renderVideo(data, displayArea); *@
+@*             else if (type === 'TN') renderQuiz(data, displayArea); *@
+@*             else if (type === 'BT') renderAssignment(data, displayArea); *@
+@*         } *@
+
+@*         // 3. RENDER VIDEO / TEXT *@
+@*         function renderVideo(data, container) { *@
+@*             let html = ''; *@
+@*             if (data.Video && data.Video.length > 5) { *@
+@*                 // Video Layout *@
+@*                 html = ` *@
+@*                     <div style="background:black; width:100%; height:100%; display:flex; flex-direction:column;"> *@
+@*                         <div style="flex:1; display:flex; justify-content:center; align-items:center;"> *@
+@*                             <video id="main-video" controls style="width:100%; height:100%; max-height:80vh;" autoplay> *@
+@*                                 <source src="${data.Video}" type="video/mp4"> *@
+@*                                 Trình duyệt không hỗ trợ. *@
+@*                             </video> *@
+@*                         </div> *@
+@*                         <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center"> *@
+@*                             <h5 class="m-0" style="font-size:16px;">${data.BaiViet || 'Bài giảng video'}</h5> *@
+@*                             <div> *@
+@*                                 ${data.FileTaiXuong ? `<a href="${data.FileTaiXuong}" target="_blank" class="btn btn-outline-light btn-sm mr-2"><i class="fas fa-download"></i> Tài liệu</a>` : ''} *@
+@*                                 <button class="btn btn-success btn-sm" onclick="markComplete('BG', ${data.MaBG})">Hoàn thành bài học</button> *@
+@*                             </div> *@
+@*                         </div> *@
+@*                     </div>`; *@
+@*                 container.html(html); *@
+
+@*                 // Auto complete on end *@
+@*                 const vid = document.getElementById('main-video'); *@
+@*                 if(vid) vid.onended = function() { markComplete('BG', data.MaBG); }; *@
+@*             } else { *@
+@*                 // Text Layout *@
+@*                 html = ` *@
+@*                     <div class="content-padding"> *@
+@*                         <h2 class="mb-4">${data.BaiViet ? data.BaiViet.substring(0, 50) + '...' : 'Bài đọc'}</h2> *@
+@*                         <div class="card p-4 mb-4"> *@
+@*                             <div style="white-space: pre-wrap; font-size: 16px; line-height: 1.6;">${data.BaiViet || 'Nội dung đang cập nhật.'}</div> *@
+@*                         </div> *@
+@*                         <div class="text-center"> *@
+@*                             <button class="btn btn-primary px-5" onclick="markComplete('BG', ${data.MaBG})">Tôi đã đọc xong</button> *@
+@*                         </div> *@
+@*                     </div>`; *@
+@*                 container.html(html); *@
+@*             } *@
+@*         } *@
+
+@*         // 4. RENDER QUIZ (TRẮC NGHIỆM) *@
+@*         function renderQuiz(data, container) { *@
+@*             let html = ` *@
+@*                 <div class="content-padding"> *@
+@*                     <div class="d-flex justify-content-between align-items-center mb-4"> *@
+@*                         <h3 class="m-0 text-primary"><i class="fas fa-tasks mr-2"></i> ${data.TieuDe || 'Bài trắc nghiệm'}</h3> *@
+@*                     </div> *@
+@*                     <div id="quiz-score" class="score-board"></div> *@
+@*             `; *@
+
+@*             if (data.CauHois && data.CauHois.length > 0) { *@
+@*                 data.CauHois.forEach((q, index) => { *@
+@*                     html += ` *@
+@*                     <div class="question-card" id="q-card-${q.MaCH}"> *@
+@*                         <div class="question-text">Câu ${index + 1}: ${q.NoiDung}</div> *@
+@*                         <div class="options-list">`; *@
+
+@*                     if(q.DapAns) { *@
+@*                         q.DapAns.forEach(a => { *@
+@*                             html += ` *@
+@*                             <label class="option-item" id="opt-${a.MaDA}"> *@
+@*                                 <input type="radio" name="q-${q.MaCH}" value="${a.MaDA}" data-correct="${a.KetQua}"> *@
+@*                                 ${a.NoiDung} *@
+@*                             </label>`; *@
+@*                         }); *@
+@*                     } *@
+@*                     html += `</div> *@
+@*                         <div class="explanation-box" id="explain-${q.MaCH}"> *@
+@*                              <strong><i class="fas fa-info-circle"></i> Giải thích:</strong> <span id="explain-text-${q.MaCH}"></span> *@
+@*                         </div> *@
+@*                     </div>`; *@
+@*                 }); *@
+@*                 html += `<button class="btn btn-primary btn-submit-quiz" onclick="submitQuiz(${data.MaTN})">Nộp Bài</button>`; *@
+@*             } else { *@
+@*                 html += `<div class="alert alert-info">Chưa có câu hỏi nào trong bài này.</div>`; *@
+@*             } *@
+@*             html += `</div>`; *@
+@*             container.html(html); *@
+@*         } *@
+
+@*         // 5. SUBMIT QUIZ LOGIC *@
+@*         function submitQuiz(tnId) { *@
+@*             const data = lessonData[`TN_${tnId}`]; *@
+@*             let score = 0; *@
+@*             let total = data.CauHois.length; *@
+
+@*             data.CauHois.forEach(q => { *@
+@*                 const selected = $(`input[name="q-${q.MaCH}"]:checked`); *@
+@*                 const card = $(`#q-card-${q.MaCH}`); *@
+@*                 const explainBox = $(`#explain-${q.MaCH}`); *@
+@*                 const explainText = $(`#explain-text-${q.MaCH}`); *@
+
+@*                 card.find('.option-item').removeClass('correct incorrect'); *@
+
+@*                 // Highlight Correct Answer *@
+@*                 let correctAns = q.DapAns.find(a => a.KetQua === true); *@
+@*                 if(correctAns) { *@
+@*                     $(`#opt-${correctAns.MaDA}`).addClass('correct'); *@
+@*                     explainText.text(correctAns.GiaiThich || "Không có giải thích chi tiết."); *@
+@*                 } *@
+
+@*                 if (selected.length > 0) { *@
+@*                     if (selected.data('correct') === true) { *@
+@*                         score++; *@
+@*                     } else { *@
+@*                         selected.parent().addClass('incorrect'); *@
+@*                     } *@
+@*                 } *@
+@*                 explainBox.slideDown(); *@
+@*             }); *@
+
+@*             const percent = Math.round((score / total) * 100); *@
+@*             let color = percent >= 50 ? "text-success" : "text-danger"; *@
+@*             let msg = percent >= 50 ? "Làm tốt lắm! Bạn đã vượt qua." : "Bạn cần xem lại bài học và thử lại."; *@
+
+@*             $('#quiz-score').html(`Kết quả: <b class="${color}">${score}/${total} câu đúng (${percent}%)</b><br><span style="font-size:14px; font-weight:normal">${msg}</span>`).fadeIn(); *@
+
+@*             $('.btn-submit-quiz').prop('disabled', true).text('Đã nộp bài'); *@
+@*             $('input[type=radio]').prop('disabled', true); *@
+
+@*             if (percent >= 50) markComplete('TN', tnId); *@
+@*         } *@
+
+@*         // 6. RENDER ASSIGNMENT (BÀI TẬP) *@
+@*         function renderAssignment(data, container) { *@
+@*             let html = ` *@
+@*                 <div class="content-padding"> *@
+@*                     <h3 class="mb-4 text-info"><i class="fas fa-file-signature mr-2"></i> ${data.TieuDe || 'Bài tập tự luận'}</h3> *@
+@*                     ${data.HuongDan ? `<div class="alert alert-secondary mb-4"><i class="fas fa-lightbulb text-warning mr-1"></i> <strong>Hướng dẫn:</strong> ${data.HuongDan}</div>` : ''} *@
+@*             `; *@
+
+@*             if (data.CauHois && data.CauHois.length > 0) { *@
+@*                 data.CauHois.forEach((q, index) => { *@
+@*                     html += ` *@
+@*                     <div class="question-card"> *@
+@*                         <div class="question-text">Câu hỏi ${index + 1}: ${q.NoiDung}</div> *@
+@*                         <div class="form-group"> *@
+@*                             <textarea class="form-control" rows="4" placeholder="Nhập câu trả lời của bạn..."></textarea> *@
+@*                         </div> *@
+@*                         <div class="model-answer" id="ans-${q.MACAU}"> *@
+@*                             <strong><i class="fas fa-key"></i> Đáp án tham khảo:</strong> *@
+@*                             <div class="mt-1">${q.DapAnMau || 'Không có đáp án mẫu.'}</div> *@
+@*                         </div> *@
+@*                     </div>`; *@
+@*                 }); *@
+@*                 html += `<button class="btn btn-primary btn-submit-quiz" onclick="submitAssignment(${data.MaBT})">Nộp bài & Xem đáp án</button>`; *@
+@*             } else { *@
+@*                 html += `<div class="alert alert-info">Bài tập này chưa có câu hỏi.</div>`; *@
+@*             } *@
+@*             html += `</div>`; *@
+@*             container.html(html); *@
+@*         } *@
+
+@*         // 7. SUBMIT ASSIGNMENT *@
+@*         function submitAssignment(btId) { *@
+@*             if(confirm('Nộp bài để xem đáp án mẫu?')) { *@
+@*                 $('.model-answer').slideDown(); *@
+@*                 $('textarea').prop('disabled', true); *@
+@*                 $('.btn-submit-quiz').prop('disabled', true).text('Đã nộp bài'); *@
+@*                 markComplete('BT', btId); *@
+@*             } *@
+@*         } *@
+
+@*         // 8. API: MARK COMPLETE *@
+@*         function markComplete(type, id) { *@
+@*             if (isPreview) { *@
+@*                 updateCheckUI(type, id); *@
+@*                 return; *@
+@*             } *@
+@*             $.ajax({ *@
+@*                 url: 'http://localhost:5105/api/KhoaHoc/MarkCompleted', // Chỉnh Port nếu cần *@
+@*                 type: 'POST', *@
+@*                 contentType: 'application/json', *@
+@*                 data: JSON.stringify({ maHV: currentUserId, maKH: maKH, type: type, id: id }), *@
+@*                 success: function(res) { *@
+@*                     if(res.success) updateCheckUI(type, id); *@
+@*                 } *@
+@*             }); *@
+@*         } *@
+
+@*         function updateCheckUI(type, id) { *@
+@*             const checkId = `#check-${type}-${id}`; *@
+@*             if (!$(checkId).hasClass('completed')) { *@
+@*                 $(checkId).addClass('completed'); *@
+@*                 $(checkId).find('i').show(); *@
+
+@*                 // Update counter text *@
+@*                 let count = parseInt($('#completed-count').text()) + 1; *@
+@*                 $('#completed-count').text(count); *@
+@*             } *@
+@*         } *@
+
+@*         // 9. API: RESET PROGRESS (AUTHOR ONLY) *@
+@*         function resetProgress() { *@
+@*             if(confirm("Xóa toàn bộ lịch sử học của bạn trong khóa này để test lại?")) { *@
+@*                 $.ajax({ *@
+@*                     url: '@Url.Action("ResetProgress", "KhoaHoc")', *@
+@*                     type: 'POST', *@
+@*                     data: { maKH: maKH }, *@
+@*                     success: function(res) { *@
+@*                         if(res.success) { *@
+@*                             alert("Đã reset thành công!"); *@
+@*                             location.reload(); *@
+@*                         } else { *@
+@*                             alert("Lỗi: " + res.message); *@
+@*                         } *@
+@*                     } *@
+@*                 }); *@
+@*             } *@
+@*         } *@
+@*     </script> *@
+@* </body> *@
+@* </html> *@
+
+
+
+@using Newtonsoft.Json
+@model QL_KhoaHoc.Models.KhoaHocCreateModel
+@{
+    Layout = null;
+    bool isPreview = ViewBag.IsPreview ?? false;
+    bool isAuthor = ViewBag.IsAuthor ?? false;
+    int currentUserId = ViewBag.CurrentUserId ?? 0;
+    var completedList = ViewBag.CompletedItems as List<dynamic> ?? new List<dynamic>();
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.TenKhoaHoc - Hệ thống học tập</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <style>
+        body {
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* --- 1. Top Bar --- */
+        .top-bar {
+            height: 64px;
+            background: #2d3e50;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .back-btn {
+            color: #b4bac2;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+            .back-btn:hover {
+                color: #fff;
+                text-decoration: none;
+            }
+
+        .course-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-left: 15px;
+            border-left: 1px solid #555;
+            padding-left: 15px;
+        }
+
+        /* --- 2. Layout --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- 3. Sidebar (Right) --- */
+        .curriculum-sidebar {
+            flex: 0 0 350px;
+            background: #fff;
+            border-left: 1px solid #dee2e6;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chapter-title {
+            background: #f1f3f5;
+            padding: 15px 20px;
+            font-weight: 700;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #343a40;
+        }
+
+        .lesson-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            transition: 0.2s;
+        }
+
+            .lesson-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .lesson-item.active {
+                background-color: #e3f2fd;
+                border-left: 4px solid #007bff;
+                padding-left: 16px;
+            }
+
+        .check-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #adb5bd;
+            border-radius: 50%;
+            margin-right: 12px;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+
+            .check-circle.completed {
+                border-color: #28a745;
+                background: #28a745;
+                color: white;
+            }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-title-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #495057;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .lesson-meta {
+            font-size: 12px;
+            color: #868e96;
+        }
+
+        .lesson-icon {
+            margin-right: 5px;
+        }
+
+        /* --- 4. Content Area (Left) --- */
+        .content-area {
+            flex: 1;
+            background: #fff;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-wrapper {
+            background: #000;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .content-padding {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* --- 5. Quiz & Assignment Styles --- */
+        .question-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #212529;
+        }
+
+        .option-item {
+            display: block;
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+
+            .option-item:hover {
+                background: #f8f9fa;
+                border-color: #ced4da;
+            }
+
+            .option-item input {
+                margin-right: 10px;
+                transform: scale(1.2);
+            }
+
+            .option-item.correct {
+                background-color: #d4edda;
+                border-color: #c3e6cb;
+                color: #155724;
+            }
+
+            .option-item.incorrect {
+                background-color: #f8d7da;
+                border-color: #f5c6cb;
+                color: #721c24;
+            }
+
+        .explanation-box {
+            margin-top: 12px;
+            padding: 12px 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            color: #856404;
+            font-size: 14px;
+            display: none;
+        }
+
+        .btn-submit-quiz {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-board {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 18px;
+            display: none;
+        }
+
+        .model-answer {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: none;
+            font-size: 15px;
+        }
+
+        /* --- 6. COMPLETION & RATING SCREEN (NEW CODE) --- */
+        .congrats-container {
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.8s ease-in-out;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-30px);
+            }
+
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .trophy-icon {
+            font-size: 100px;
+            color: #ffc107;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .star-rating {
+            font-size: 32px;
+            color: #d6d6d6;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+            .star-rating i {
+                transition: color 0.2s;
+            }
+
+                .star-rating i.hover,
+                .star-rating i.active {
+                    color: #ffc107;
+                }
+
+        .review-box textarea {
+            resize: none;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        @@keyframes blink {
+            0%
+
+        {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+
+        }
+
+        .blinking-alert {
+            animation: blink 1s infinite;
+            background-color: #dc3545 !important;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="d-flex align-items-center">
+            @if (isAuthor)
+            {
+                <a href="@Url.Action("QuanLyBanNhap", "KhoaHoc")" class="back-btn"><i class="fas fa-arrow-left mr-2"></i> Về trang quản lý</a>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Home")" class="back-btn"><i class="fas fa-arrow-left mr-2"></i> Trang chủ</a>
+            }
+            <span class="course-title">@Model.TenKhoaHoc</span>
+            @if (isPreview)
+            {
+                <span class="badge badge-warning ml-2 text-dark">Chế độ xem trước</span>
+            }
+        </div>
+
+        <div class="d-flex align-items-center">
+            @if (isAuthor)
+            {
+                <button class="btn btn-sm btn-danger mr-3" onclick="resetProgress()">
+                    <i class="fas fa-trash-restore mr-1"></i> Reset Tiến Độ Test
+                </button>
+            }
+            <div class="text-right" style="min-width: 150px;">
+                <div style="font-size: 12px; opacity: 0.8;">Tiến độ</div>
+                <div style="font-weight: bold;"> <span id="completed-count">0</span>/<span id="total-count">@ViewBag.TotalItems</span> bài</div>
+
+                <div class="progress mt-1" style="height: 4px; background-color: rgba(255,255,255,0.2);">
+                    <div id="course-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="content-area" id="content-display">
+            <div class="video-wrapper" style="height: 100%; background: #2d3e50;">
+                <div class="text-white text-center">
+                    <i class="fas fa-play-circle mb-3" style="font-size: 64px; opacity: 0.5;"></i>
+                    <h3>Sẵn sàng học?</h3>
+                    <p class="text-muted">Chọn bài học đầu tiên ở menu bên phải để bắt đầu.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="curriculum-sidebar">
+            @{
+                // Dictionary để lưu toàn bộ data xuống Client
+                var lessonDataMap = new Dictionary<string, object>();
+                int totalItems = 0;
+                int completedCount = 0;
+            }
+
+            @if (Model.ChuongMucs != null)
+            {
+                foreach (var chuong in Model.ChuongMucs.OrderBy(c => c.ThuTu))
+                {
+                    <div class="chapter-title">@chuong.TenChuong</div>
+
+                    <div class="chapter-content">
+                        @{
+                            var mixedList = new List<dynamic>();
+
+                            if (chuong.BaiGiangs != null)
+                                mixedList.AddRange(chuong.BaiGiangs.Select(x => new { Type = "BG", Id = x.MaBG, Title = x.BaiViet, Order = x.ThuTu, Url = x.Video, Data = x }));
+
+                            if (chuong.TracNghiems != null)
+                                mixedList.AddRange(chuong.TracNghiems.Select(x => new { Type = "TN", Id = x.MaTN, Title = x.TieuDe, Order = x.ThuTu, Url = "", Data = x }));
+
+                            if (chuong.BaiTaps != null)
+                                mixedList.AddRange(chuong.BaiTaps.Select(x => new { Type = "BT", Id = x.MaBT, Title = x.TieuDe, Order = x.ThuTu, Url = "", Data = x }));
+
+                            var sortedList = mixedList.OrderBy(x => x.Order).ToList();
+                        }
+
+                        @foreach (var item in sortedList)
+                        {
+                            totalItems++;
+                            string key = $"{item.Type}_{item.Id}";
+                            lessonDataMap[key] = item.Data;
+
+                            // Check completed
+                            bool isDone = false;
+                            if (completedList != null)
+                            {
+                                foreach (var c in completedList)
+                                {
+                                    if (c.Type == item.Type && c.Id == item.Id) { isDone = true; completedCount++; break; }
+                                }
+                            }
+
+                            string typeIcon = "fa-file-alt";
+                            string typeName = "Bài đọc";
+                            if (item.Type == "BG" && !string.IsNullOrEmpty(item.Url)) { typeIcon = "fa-play-circle"; typeName = "Video"; }
+                            if (item.Type == "TN") { typeIcon = "fa-question-circle"; typeName = "Trắc nghiệm"; }
+                            if (item.Type == "BT") { typeIcon = "fa-pencil-alt"; typeName = "Bài tập"; }
+
+                            <div class="lesson-item" onclick="selectLesson('@item.Type', @item.Id, this)">
+                                <div class="check-circle @(isDone ? "completed" : "")" id="check-@item.Type-@item.Id">
+                                    <i class="fas fa-check" style="font-size: 10px; @(isDone ? "" : "display:none")"></i>
+                                </div>
+
+                                <div class="lesson-info">
+                                    <span class="lesson-title-text">@item.Title</span>
+                                    <span class="lesson-meta"><i class="fas @typeIcon lesson-icon"></i> @typeName</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+       // 1. INIT DATA
+        const currentUserId = @currentUserId;
+        const maKH = @Model.MaKhoaHoc;
+        const isPreview = @(isPreview.ToString().ToLower());
+        const lessonData = @Html.Raw(JsonConvert.SerializeObject(lessonDataMap));
+        // Biến toàn cục để lưu interval đếm ngược
+        let currentTimerInterval = null;
+
+        // --- QUAN TRỌNG: Lấy danh sách đã học từ Server ---
+        const completedList = @Html.Raw(JsonConvert.SerializeObject(completedList)); 
+
+        // --- NEW CODE: Use variable for Total Lessons ---
+        const totalLessons = @totalItems;
+        // Tính số lượng thực tế dựa trên danh sách đã load
+        let currentCompleted = completedList ? completedList.length : 0;
+
+        // Update initial counter
+        $('#completed-count').text(currentCompleted);
+        $('#total-count').text(totalLessons);
+
+         // --- LOGIC MỚI: TÔ MÀU CÁC BÀI ĐÃ HỌC KHI LOAD TRANG ---
+         $(document).ready(function() {
+             // Debug: Xem dữ liệu thực tế nhận được là gì (F12 -> Console)
+             console.log("Danh sách đã học:", completedList);
+
+             if (completedList && completedList.length > 0) {
+                 completedList.forEach(function(item) {
+                     // SỬA LỖI: Kiểm tra cả 2 trường hợp viết hoa hoặc viết thường
+                     // Vì JSON có thể trả về 'type' hoặc 'Type' tùy cấu hình server
+                     var type = item.Type || item.type;
+                     var id = item.Id || item.id;
+
+                     // Tạo selector
+                     var selector = `#check-${type}-${id}`;
+                     var element = $(selector);
+
+                     // Thêm class completed và hiện dấu tích
+                     if (element.length > 0) {
+                         element.addClass('completed');
+                         element.find('i').show();
+                     } else {
+                         console.warn("Không tìm thấy phần tử HTML cho bài học:", selector);
+                     }
+                 });
+             }
+
+             // Cập nhật thanh tiến độ ngay lập tức
+             if (totalLessons > 0) {
+                 const initPercent = Math.round((currentCompleted / totalLessons) * 100);
+                 $('#course-progress-bar').css('width', initPercent + '%');
+             }
+         });
+
+        @* // 2. MAIN NAVIGATION *@
+        @* function selectLesson(type, id, element) { *@
+        @*     $('.lesson-item').removeClass('active'); *@
+        @*     $(element).addClass('active'); *@
+
+        @*     const key = `${type}_${id}`; *@
+        @*     const data = lessonData[key]; *@
+        @*     const displayArea = $('#content-display'); *@
+
+        @*     displayArea.empty(); *@
+
+        @*     if (type === 'BG') renderVideo(data, displayArea); *@
+        @*     else if (type === 'TN') renderQuiz(data, displayArea); *@
+        @*     else if (type === 'BT') renderAssignment(data, displayArea); *@
+        @* } *@
+                // 2. MAIN NAVIGATION
+        function selectLesson(type, id, element) {
+            $('.lesson-item').removeClass('active');
+            $(element).addClass('active');
+
+            const key = `${type}_${id}`;
+            const data = lessonData[key];
+            const displayArea = $('#content-display');
+
+            displayArea.empty();
+
+            if (type === 'BG') {
+                renderVideo(data, displayArea);
+            }
+            else if (type === 'TN') {
+                renderQuiz(data, displayArea);
+                // [MỚI] Nếu đã hoàn thành, load lại kết quả cũ
+                checkAndLoadResult(type, id);
+            }
+            else if (type === 'BT') {
+                renderAssignment(data, displayArea);
+                // [MỚI] Nếu đã hoàn thành, load lại kết quả cũ
+                checkAndLoadResult(type, id);
+            }
+        }
+
+                function checkAndLoadResult(type, id) {
+            // Kiểm tra trong danh sách completedList xem bài này xong chưa
+            // Lưu ý: completedList chứa object { Type: "TN", Id: 10 }
+            const isDone = completedList.some(item =>
+                (item.Type || item.type) == type && (item.Id || item.id) == id
+            );
+
+            if (isDone) {
+                // Gọi API lấy dữ liệu chi tiết
+                $.ajax({
+                    url: `/KhoaHoc/GetKetQua?type=${type}&id=${id}`,
+                    type: 'GET',
+                    success: function(result) {
+                        if (result) {
+                            if (type === 'TN') {
+                                fillQuizData(id, result);
+                            } else {
+                                fillAssignmentData(id, result);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        @* // Hàm điền dữ liệu Trắc Nghiệm cũ *@
+        @* function fillQuizData(tnId, result) { *@
+        @*     // 1. Điền các lựa chọn của học viên *@
+        @*     result.chiTiet.forEach(ans => { *@
+        @*         // Check vào radio button tương ứng *@
+        @*         if(ans.maDA) { *@
+        @*             const radio = $(`input[name="q-${ans.maCauHoi}"][value="${ans.maDA}"]`); *@
+        @*             radio.prop('checked', true); *@
+
+        @*             // Tô màu đúng/sai *@
+        @*             if(ans.isCorrect) { *@
+        @*                 radio.parent().addClass('correct'); *@
+        @*             } else { *@
+        @*                 radio.parent().addClass('incorrect'); *@
+        @*             } *@
+        @*         } *@
+        @*         // Hiện giải thích *@
+        @*         $(`#explain-${ans.maCauHoi}`).show(); *@
+        @*     }); *@
+
+        @*     // 2. Khóa tất cả input *@
+        @*     $(`input[type=radio]`).prop('disabled', true); *@
+
+        @*     // 3. Hiển thị bảng điểm *@
+        @*     const percent = Math.round((result.soCauDung / result.tongSoCau) * 100); *@
+        @*     let color = percent >= 50 ? "text-success" : "text-danger"; *@
+
+        @*     // HTML Bảng điểm + Nút Làm Lại *@
+        @*     let scoreHtml = ` *@
+        @*         <div class="text-center"> *@
+        @*              <div class="alert alert-info">Bạn đã hoàn thành bài này vào ngày: ${new Date(result.ngayLam || Date.now()).toLocaleDateString('vi-VN')}</div> *@
+        @*             Kết quả: <b class="${color}">${result.soCauDung}/${result.tongSoCau} câu đúng (${percent}%)</b> *@
+        @*             <div class="mt-3"> *@
+        @*                 <button class="btn btn-warning btn-sm" onclick="redoQuiz(${tnId})"> *@
+        @*                     <i class="fas fa-redo"></i> Làm lại bài này *@
+        @*                 </button> *@
+        @*             </div> *@
+        @*         </div> *@
+        @*     `; *@
+
+        @*     $('#quiz-score').html(scoreHtml).show(); *@
+        @*     $('.btn-submit-quiz').prop('disabled', true).text('Đã hoàn thành'); *@
+        @* } *@
+
+                // Hàm điền dữ liệu Trắc Nghiệm cũ
+        function fillQuizData(tnId, result) {
+            // [MỚI] 1. Ẩn màn hình chờ, Hiện màn hình nội dung ngay
+            $(`#quiz-start-${tnId}`).hide();
+            $(`#quiz-content-${tnId}`).show();
+
+            // 2. Điền các lựa chọn của học viên (Code cũ)
+            result.chiTiet.forEach(ans => {
+                if(ans.maDA) {
+                    const radio = $(`input[name="q-${ans.maCauHoi}"][value="${ans.maDA}"]`);
+                    radio.prop('checked', true);
+
+                    if(ans.isCorrect) {
+                        radio.parent().addClass('correct');
+                    } else {
+                        radio.parent().addClass('incorrect');
+                    }
+                }
+                $(`#explain-${ans.maCauHoi}`).show();
+            });
+
+            // 3. Khóa tất cả input (Code cũ)
+            $(`input[type=radio]`).prop('disabled', true);
+
+            // 4. Hiển thị bảng điểm (Code cũ)
+            const percent = Math.round((result.soCauDung / result.tongSoCau) * 100);
+            let color = percent >= 50 ? "text-success" : "text-danger";
+
+            let scoreHtml = `
+                <div class="text-center">
+                     <div class="alert alert-info">Bạn đã hoàn thành bài này vào ngày: ${new Date(result.ngayLam || Date.now()).toLocaleDateString('vi-VN')}</div>
+                    Kết quả: <b class="${color}">${result.soCauDung}/${result.tongSoCau} câu đúng (${percent}%)</b>
+                    <div class="mt-3">
+                        <button class="btn btn-warning btn-sm" onclick="redoQuiz(${tnId})">
+                            <i class="fas fa-redo"></i> Làm lại bài này
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            $('#quiz-score').html(scoreHtml).show();
+            $('.btn-submit-quiz').prop('disabled', true).text('Đã hoàn thành').hide(); // Ẩn luôn nút nộp bài gốc
+        }
+
+                // --- HÀM LÀM LẠI BÀI TRẮC NGHIỆM ---
+            @* function redoQuiz(tnId) { *@
+            @*     if(!confirm("Làm lại bài này sẽ được tính là một lần thi mới. Dữ liệu cũ sẽ vẫn được lưu trong lịch sử. Bạn có chắc không?")) return; *@
+
+            @*     // 1. Lấy dữ liệu bài học từ biến toàn cục *@
+            @*     // Lưu ý: key trong lessonData phải khớp với lúc tạo (VD: TN_10) *@
+            @*     const data = lessonData[`TN_${tnId}`]; *@
+
+            @*     if (!data) { *@
+            @*         console.error("Không tìm thấy dữ liệu bài học ID:", tnId); *@
+            @*         return; *@
+            @*     } *@
+
+            @*     // 2. Ẩn bảng điểm kết quả *@
+            @*     $('#quiz-score').hide().empty(); *@
+
+            @*     // 3. Reset trạng thái từng câu hỏi *@
+            @*     data.CauHois.forEach(q => { *@
+            @*         // Bỏ chọn và mở khóa radio button *@
+            @*         // Selector: input có name="q-{Mã Câu Hỏi}" *@
+            @*         const inputs = $(`input[name="q-${q.MaCH}"]`); *@
+            @*         inputs.prop('checked', false); *@
+            @*         inputs.prop('disabled', false); // Quan trọng: Mở khóa để chọn lại *@
+
+            @*         // Xóa màu xanh/đỏ ở các đáp án (nếu dùng class option-item) *@
+            @*         // Tìm thẻ cha chứa input để xóa class correct/incorrect *@
+            @*         inputs.closest('.option-item').removeClass('correct incorrect'); *@
+            @*         // Hoặc tìm theo ID card nếu cấu trúc HTML của bạn khác *@
+            @*         $(`#q-card-${q.MaCH} .option-item`).removeClass('correct incorrect'); *@
+
+            @*         // Ẩn giải thích *@
+            @*         $(`#explain-${q.MaCH}`).hide(); *@
+            @*     }); *@
+
+            @*     // 4. Reset nút Nộp bài *@
+            @*     // Nếu nút nộp bài bị ẩn hoặc đổi text -> Khôi phục lại *@
+            @*     // Tìm nút submit trong container của bài trắc nghiệm đó (hoặc tìm class chung nếu chỉ hiện 1 bài) *@
+            @*     const btnSubmit = $('.btn-submit-quiz'); *@
+            @*     btnSubmit.prop('disabled', false).text('Nộp Bài').show(); *@
+
+            @*     // Xóa nút "Làm lại" nếu nó nằm đè lên nút nộp bài (trường hợp bạn dùng replaceWith) *@
+            @*     // Nhưng ở code trước ta để nút Làm lại bên trong #quiz-score nên lệnh ở bước 2 đã ẩn nó rồi. *@
+
+            @*     // 5. Cuộn lên đầu để học viên bắt đầu làm *@
+            @*     $('html, body').animate({ *@
+            @*         scrollTop: $(".content-padding").offset().top - 50 *@
+            @*     }, 500); *@
+            @* } *@
+
+                    function redoQuiz(tnId) {
+            if(!confirm("Làm lại bài này sẽ được tính là một lần thi mới...")) return;
+
+            const data = lessonData[`TN_${tnId}`];
+
+            // 1. Đảm bảo hiển thị đúng màn hình
+            $(`#quiz-start-${tnId}`).hide();
+            $(`#quiz-content-${tnId}`).show();
+
+            // 2. Reset các trạng thái (Code cũ)
+            $('#quiz-score').hide().empty();
+
+            data.CauHois.forEach(q => {
+                const inputs = $(`input[name="q-${q.MaCH}"]`);
+                inputs.prop('checked', false).prop('disabled', false);
+
+                $(`#q-card-${q.MaCH} .option-item`).removeClass('correct incorrect');
+                $(`#explain-${q.MaCH}`).hide();
+            });
+
+            // 3. Hiện lại nút Nộp bài
+            $('.btn-submit-quiz').prop('disabled', false).text('Nộp Bài').show();
+
+            $('html, body').animate({
+                scrollTop: $(".content-padding").offset().top - 50
+            }, 500);
+        }
+        @* // Hàm điền dữ liệu Bài Tập cũ *@
+        @* function fillAssignmentData(btId, result) { *@
+        @*     result.chiTiet.forEach(ans => { *@
+        @*         // Tìm textarea và điền nội dung cũ *@
+        @*         // Cần đảm bảo textarea có class hoặc cấu trúc tìm kiếm đúng *@
+        @*         // Tìm textarea trong card của câu hỏi (logic tìm kiếm dựa trên cấu trúc HTML renderAssignment) *@
+        @*         // Giả sử renderAssignment render ra cấu trúc giống Hoc.cshtml cũ *@
+        @*         // Ta tìm tất cả textarea trong container, và điền theo thứ tự hoặc ID nếu có *@
+
+        @*         // Cách tốt nhất: Tìm theo ID câu hỏi nếu bạn đã gắn ID vào textarea (như gợi ý trước: id="txt-bt-${q.MACAU}") *@
+        @*         // Nếu chưa gắn ID, ta tìm tương đối (cách này hơi rủi ro nếu thứ tự thay đổi) *@
+
+        @*         // Giả sử trong renderAssignment bạn đã render: <div id="bt-q-${ans.maCauHoi}"> ... <textarea> ... </div> *@
+        @*         // Nếu chưa, hãy cập nhật renderAssignment. *@
+
+        @*         // Tạm thời dùng cách tìm theo ID text-area (Bạn cần update renderAssignment để thêm id="txt-bt-${q.MACAU}") *@
+        @*         $(`#txt-bt-${ans.maCauHoi}`).val(ans.cauTraLoi).prop('disabled', true); *@
+        @*     }); *@
+
+        @*     // Hiện đáp án mẫu *@
+        @*     $('.model-answer').show(); *@
+
+        @*     // Đổi nút nộp bài thành nút Làm lại *@
+        @*     $('.btn-submit-quiz').replaceWith(` *@
+        @*          <button class="btn btn-warning w-100 mt-3" onclick="redoAssignment(${btId})"> *@
+        @*             <i class="fas fa-redo"></i> Làm lại bài tập *@
+        @*         </button> *@
+        @*     `); *@
+        @* } *@
+
+                // Cập nhật hàm này
+                function fillAssignmentData(btId, result) {
+            // 1. [QUAN TRỌNG] Dừng Timer nếu đang chạy ngầm
+            if (typeof currentTimerInterval !== 'undefined' && currentTimerInterval) {
+                clearInterval(currentTimerInterval);
+            }
+
+            // 2. Bỏ qua màn hình chờ, hiện luôn nội dung
+            $(`#bt-start-${btId}`).hide();
+            $(`#bt-content-${btId}`).show();
+
+            // 3. [MỚI] Cập nhật giao diện Timer thành "Đã kết thúc"
+            const timerBox = $(`#timer-box-${btId}`);
+            if (timerBox.length > 0) {
+                timerBox.removeClass('badge-danger blinking-alert').addClass('badge-secondary');
+                timerBox.html('<i class="fas fa-check-circle mr-1"></i> Đã kết thúc');
+            }
+
+            // 4. Điền dữ liệu cũ vào các ô text
+            if (result.chiTiet && result.chiTiet.length > 0) {
+                result.chiTiet.forEach(ans => {
+                    // Đảm bảo lấy đúng ID câu hỏi
+                    let qId = ans.maCauHoi || ans.MaCauHoi;
+                    $(`#txt-bt-${qId}`).val(ans.cauTraLoi).prop('disabled', true);
+                });
+            }
+
+            // 5. Hiện đáp án mẫu
+            $('.model-answer').show();
+
+            // 6. Đổi nút Nộp bài thành nút Làm lại
+            // Tìm chính xác nút nộp bài trong container hiện tại để thay thế
+            $(`#bt-content-${btId} .btn-submit-quiz`).replaceWith(`
+                <button class="btn btn-warning w-100 mt-3" onclick="redoAssignment(${btId})">
+                    <i class="fas fa-redo"></i> Làm lại bài tập
+                </button>
+            `);
+        }
+        // 3. RENDER VIDEO / TEXT
+        // 3. RENDER VIDEO / TEXT (Đã cập nhật nút Tải tài liệu)
+         function renderVideo(data, container) {
+             let html = '';
+
+             // Tạo nút tải tài liệu chung (nếu có file)
+             let downloadBtn = '';
+             if (data.FileTaiXuong) {
+                 // target="_blank" giúp mở tab mới để xem (với PDF) hoặc tải xuống
+                 downloadBtn = `
+                     <a href="${data.FileTaiXuong}" target="_blank" class="btn btn-info btn-sm mr-2" title="Xem hoặc tải tài liệu">
+                         <i class="fas fa-file-download mr-1"></i> Tài liệu đính kèm
+                     </a>`;
+             }
+
+             if (data.Video && data.Video.length > 5) {
+                 // --- GIAO DIỆN VIDEO ---
+                 html = `
+                     <div style="background:black; width:100%; height:100%; display:flex; flex-direction:column;">
+                         <div style="flex:1; display:flex; justify-content:center; align-items:center;">
+                             <video id="main-video" controls style="width:100%; height:100%; max-height:80vh;" autoplay>
+                                 <source src="${data.Video}" type="video/mp4">
+                                 Trình duyệt không hỗ trợ thẻ video.
+                             </video>
+                         </div>
+                         <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+                             <h5 class="m-0" style="font-size:16px;">
+                                 <i class="fas fa-play-circle mr-2"></i> ${data.BaiViet || 'Bài giảng video'}
+                             </h5>
+                             <div class="d-flex align-items-center">
+                                 ${downloadBtn}
+                                 <button class="btn btn-success btn-sm" onclick="markComplete('BG', ${data.MaBG})">
+                                     <i class="fas fa-check mr-1"></i> Hoàn thành
+                                 </button>
+                             </div>
+                         </div>
+                     </div>`;
+
+                 container.html(html);
+
+                 // Tự động hoàn thành khi xem hết video
+                 const vid = document.getElementById('main-video');
+                 if(vid) vid.onended = function() { markComplete('BG', data.MaBG); };
+             } else {
+                 // --- GIAO DIỆN BÀI ĐỌC (TEXT) ---
+                 html = `
+                     <div class="content-padding">
+                         <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+                             <h2 class="m-0 text-primary">${data.BaiViet ? data.BaiViet.substring(0, 50) + (data.BaiViet.length>50?'...':'') : 'Bài đọc'}</h2>
+
+                             <div class="ml-3">
+                                 ${downloadBtn}
+                             </div>
+                         </div>
+
+                         <div class="card p-4 mb-4 shadow-sm border-0">
+                             <div style="white-space: pre-wrap; font-size: 16px; line-height: 1.8; color: #333;">${data.BaiViet || 'Nội dung đang cập nhật.'}</div>
+                         </div>
+
+                         <div class="text-center">
+                             <button class="btn btn-primary px-5 py-2 shadow" onclick="markComplete('BG', ${data.MaBG})">
+                                 <i class="fas fa-check-circle mr-2"></i> Tôi đã đọc xong
+                             </button>
+                         </div>
+                     </div>`;
+
+                 container.html(html);
+             }
+         }
+        @* // 4. RENDER QUIZ (TRẮC NGHIỆM) *@
+        @* function renderQuiz(data, container) { *@
+        @*     let html = ` *@
+        @*         <div class="content-padding"> *@
+        @*             <div class="d-flex justify-content-between align-items-center mb-4"> *@
+        @*                 <h3 class="m-0 text-primary"><i class="fas fa-tasks mr-2"></i> ${data.TieuDe || 'Bài trắc nghiệm'}</h3> *@
+        @*             </div> *@
+        @*             <div id="quiz-score" class="score-board"></div> *@
+        @*     `; *@
+
+        @*     if (data.CauHois && data.CauHois.length > 0) { *@
+        @*         data.CauHois.forEach((q, index) => { *@
+        @*             html += ` *@
+        @*             <div class="question-card" id="q-card-${q.MaCH}"> *@
+        @*                 <div class="question-text">Câu ${index + 1}: ${q.NoiDung}</div> *@
+        @*                 <div class="options-list">`; *@
+
+        @*             if(q.DapAns) { *@
+        @*                 q.DapAns.forEach(a => { *@
+        @*                     html += ` *@
+        @*                     <label class="option-item" id="opt-${a.MaDA}"> *@
+        @*                         <input type="radio" name="q-${q.MaCH}" value="${a.MaDA}" data-correct="${a.KetQua}"> *@
+        @*                         ${a.NoiDung} *@
+        @*                     </label>`; *@
+        @*                 }); *@
+        @*             } *@
+        @*             html += `</div> *@
+        @*                 <div class="explanation-box" id="explain-${q.MaCH}"> *@
+        @*                      <strong><i class="fas fa-info-circle"></i> Giải thích:</strong> <span id="explain-text-${q.MaCH}"></span> *@
+        @*                 </div> *@
+        @*             </div>`; *@
+        @*         }); *@
+        @*         html += `<button class="btn btn-primary btn-submit-quiz" onclick="submitQuiz(${data.MaTN})">Nộp Bài</button>`; *@
+        @*     } else { *@
+        @*         html += `<div class="alert alert-info">Chưa có câu hỏi nào trong bài này.</div>`; *@
+        @*     } *@
+        @*     html += `</div>`; *@
+        @*     container.html(html); *@
+        @* } *@
+
+                // 4. RENDER QUIZ (TRẮC NGHIỆM) - CẬP NHẬT
+        function renderQuiz(data, container) {
+            let html = `
+                <div class="content-padding">
+                    <div id="quiz-start-${data.MaTN}" class="text-center py-5">
+                        <i class="fas fa-tasks text-primary mb-3" style="font-size: 60px;"></i>
+                        <h3 class="mb-3">${data.TieuDe || 'Bài trắc nghiệm'}</h3>
+                        <p class="text-muted" style="font-size: 16px;">
+                            Tổng số câu hỏi: <strong>${data.CauHois ? data.CauHois.length : 0} câu</strong>
+                        </p>
+                        <button class="btn btn-primary btn-lg px-5 mt-3 shadow" onclick="startQuiz(${data.MaTN})">
+                            <i class="fas fa-play mr-2"></i> Bắt đầu làm bài
+                        </button>
+                    </div>
+
+                    <div id="quiz-content-${data.MaTN}" style="display:none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                            <h4 class="m-0 text-primary"><i class="fas fa-file-alt mr-2"></i> ${data.TieuDe || 'Bài trắc nghiệm'}</h4>
+                        </div>
+
+                        <div id="quiz-score" class="score-board"></div>
+            `;
+
+            if (data.CauHois && data.CauHois.length > 0) {
+                data.CauHois.forEach((q, index) => {
+                    html += `
+                    <div class="question-card" id="q-card-${q.MaCH}">
+                        <div class="question-text">Câu ${index + 1}: ${q.NoiDung}</div>
+                        <div class="options-list">`;
+
+                    if(q.DapAns) {
+                        q.DapAns.forEach(a => {
+                            html += `
+                            <label class="option-item" id="opt-${a.MaDA}">
+                                <input type="radio" name="q-${q.MaCH}" value="${a.MaDA}" data-correct="${a.KetQua}">
+                                ${a.NoiDung}
+                            </label>`;
+                        });
+                    }
+                    html += `</div>
+                        <div class="explanation-box" id="explain-${q.MaCH}">
+                                <strong><i class="fas fa-info-circle"></i> Giải thích:</strong> <span id="explain-text-${q.MaCH}"></span>
+                        </div>
+                    </div>`;
+                });
+
+                html += `<button class="btn btn-primary btn-submit-quiz" onclick="submitQuiz(${data.MaTN})">Nộp Bài</button>`;
+            } else {
+                html += `<div class="alert alert-info">Chưa có câu hỏi nào trong bài này.</div>`;
+            }
+
+            html += `</div></div>`; // Đóng div quiz-content và content-padding
+            container.html(html);
+        }
+
+
+                // --- HÀM BẮT ĐẦU LÀM BÀI ---
+        function startQuiz(tnId) {
+            // Ẩn màn hình chờ
+            $(`#quiz-start-${tnId}`).slideUp();
+            // Hiện màn hình làm bài
+            $(`#quiz-content-${tnId}`).fadeIn();
+
+            // Cuộn lên đầu để bắt đầu
+            $('html, body').animate({ scrollTop: 0 }, 500);
+        }
+        // 5. SUBMIT QUIZ LOGIC
+        @* function submitQuiz(tnId) { *@
+        @*     const data = lessonData[`TN_${tnId}`]; *@
+        @*     let score = 0; *@
+        @*     let total = data.CauHois.length; *@
+
+        @*     data.CauHois.forEach(q => { *@
+        @*         const selected = $(`input[name="q-${q.MaCH}"]:checked`); *@
+        @*         const card = $(`#q-card-${q.MaCH}`); *@
+        @*         const explainBox = $(`#explain-${q.MaCH}`); *@
+        @*         const explainText = $(`#explain-text-${q.MaCH}`); *@
+
+        @*         card.find('.option-item').removeClass('correct incorrect'); *@
+
+        @*         // Highlight Correct Answer *@
+        @*         let correctAns = q.DapAns.find(a => a.KetQua === true); *@
+        @*         if(correctAns) { *@
+        @*             $(`#opt-${correctAns.MaDA}`).addClass('correct'); *@
+        @*             explainText.text(correctAns.GiaiThich || "Không có giải thích chi tiết."); *@
+        @*         } *@
+
+        @*         if (selected.length > 0) { *@
+        @*             if (selected.data('correct') === true) { *@
+        @*                 score++; *@
+        @*             } else { *@
+        @*                 selected.parent().addClass('incorrect'); *@
+        @*             } *@
+        @*         } *@
+        @*         explainBox.slideDown(); *@
+        @*     }); *@
+
+        @*     const percent = Math.round((score / total) * 100); *@
+        @*     let color = percent >= 50 ? "text-success" : "text-danger"; *@
+        @*     let msg = percent >= 50 ? "Làm tốt lắm! Bạn đã vượt qua." : "Bạn cần xem lại bài học và thử lại."; *@
+
+        @*     $('#quiz-score').html(`Kết quả: <b class="${color}">${score}/${total} câu đúng (${percent}%)</b><br><span style="font-size:14px; font-weight:normal">${msg}</span>`).fadeIn(); *@
+
+        @*     $('.btn-submit-quiz').prop('disabled', true).text('Đã nộp bài'); *@
+        @*     $('input[type=radio]').prop('disabled', true); *@
+
+        @*     if (percent >= 50) markComplete('TN', tnId); *@
+        @* } *@
+
+                function submitQuiz(tnId) {
+            const data = lessonData[`TN_${tnId}`];
+            let score = 0;
+            let total = data.CauHois.length;
+            let userAnswers = []; // Mảng chứa chi tiết
+
+            // 1. Duyệt qua từng câu hỏi để chấm điểm và lấy dữ liệu
+            data.CauHois.forEach(q => {
+                const selected = $(`input[name="q-${q.MaCH}"]:checked`);
+                const card = $(`#q-card-${q.MaCH}`);
+                const explainBox = $(`#explain-${q.MaCH}`);
+                const explainText = $(`#explain-text-${q.MaCH}`);
+
+                // Reset màu sắc cũ
+                card.find('.option-item').removeClass('correct incorrect');
+
+                let isCorrect = false;
+                let selectedMaDA = null;
+
+                // Tìm đáp án đúng của câu hỏi này trong data
+                let correctAns = q.DapAns.find(a => a.KetQua === true);
+
+                // Xử lý giao diện (Tô màu xanh đáp án đúng)
+                if(correctAns) {
+                    $(`#opt-${correctAns.MaDA}`).addClass('correct');
+                    explainText.text(correctAns.GiaiThich || "Không có giải thích chi tiết.");
+                }
+
+                // Xử lý logic chấm điểm
+                if (selected.length > 0) {
+                    selectedMaDA = parseInt(selected.val()); // Lấy ID đáp án user chọn
+                    if (selected.data('correct') === true) {
+                        score++;
+                        isCorrect = true;
+                    } else {
+                        selected.parent().addClass('incorrect'); // Tô đỏ nếu chọn sai
+                    }
+                }
+                explainBox.slideDown();
+
+                // Thêm vào danh sách gửi về server
+                userAnswers.push({
+                    MaCauHoi: q.MaCH,
+                    MaDA: selectedMaDA,
+                    IsCorrect: isCorrect
+                });
+            });
+
+            // 2. Hiển thị kết quả
+            const percent = Math.round((score / total) * 100);
+            let color = percent >= 50 ? "text-success" : "text-danger";
+            let msg = percent >= 50 ? "Làm tốt lắm!" : "Cần cố gắng hơn.";
+
+            $('#quiz-score').html(`Kết quả: <b class="${color}">${score}/${total} câu đúng (${percent}%)</b><br><span>${msg}</span>`).fadeIn();
+
+            // Khóa nút nộp bài
+            $('.btn-submit-quiz').prop('disabled', true).text('Đã nộp bài');
+            $('input[type=radio]').prop('disabled', true);
+
+            // 3. Gửi dữ liệu lưu về Server (QUAN TRỌNG)
+            saveResultToServer('TN', tnId, score, total, userAnswers);
+
+            // 4. Đánh dấu tiến độ (Tích xanh)
+            markComplete('TN', tnId);
+        }
+
+        @* // 6. RENDER ASSIGNMENT (BÀI TẬP) *@
+        @* function renderAssignment(data, container) { *@
+        @*     let html = ` *@
+        @*         <div class="content-padding"> *@
+        @*             <h3 class="mb-4 text-info"><i class="fas fa-file-signature mr-2"></i> ${data.TieuDe || 'Bài tập tự luận'}</h3> *@
+        @*             ${data.HuongDan ? `<div class="alert alert-secondary mb-4"><i class="fas fa-lightbulb text-warning mr-1"></i> <strong>Hướng dẫn:</strong> ${data.HuongDan}</div>` : ''} *@
+        @*     `; *@
+
+        @*     if (data.CauHois && data.CauHois.length > 0) { *@
+        @*          data.CauHois.forEach((q, index) => { *@
+        @*              // Lấy ID câu hỏi chuẩn xác (ưu tiên MACAU) *@
+        @*              let qId = q.MACAU || q.macau || q.MaCauHoi; *@
+
+        @*              html += ` *@
+        @*              <div class="question-card"> *@
+        @*                  <div class="question-text">Câu hỏi ${index + 1}: ${q.NoiDung}</div> *@
+        @*                  <div class="form-group"> *@
+        @*                      <textarea id="txt-bt-${qId}" class="form-control" rows="4" placeholder="Nhập câu trả lời..."></textarea> *@
+        @*                  </div> *@
+        @*                  <div class="model-answer" id="ans-${qId}"> *@
+        @*                      <strong><i class="fas fa-key"></i> Đáp án tham khảo:</strong> *@
+        @*                      <div class="mt-1">${q.DapAnMau || 'Không có đáp án mẫu.'}</div> *@
+        @*                  </div> *@
+        @*              </div>`; *@
+        @*          }); *@
+        @*         html += `<button class="btn btn-primary btn-submit-quiz" onclick="submitAssignment(${data.MaBT})">Nộp bài & Xem đáp án</button>`; *@
+        @*     } else { *@
+        @*         html += `<div class="alert alert-info">Bài tập này chưa có câu hỏi.</div>`; *@
+        @*     } *@
+        @*     html += `</div>`; *@
+        @*     container.html(html); *@
+        @* } *@
+
+        @*         // 6. RENDER ASSIGNMENT (BÀI TẬP TỰ LUẬN) - CẬP NHẬT *@
+        @* function renderAssignment(data, container) { *@
+        @*     // Chuẩn bị hiển thị Thời lượng và Hướng dẫn *@
+        @*     let timeHtml = data.ThoiLuong && data.ThoiLuong > 0 *@
+        @*         ? `<span class="badge badge-warning px-3 py-2 mr-2" style="font-size: 14px;"><i class="fas fa-clock mr-1"></i> Thời lượng: ${data.ThoiLuong} phút</span>` *@
+        @*         : ''; *@
+
+        @*     let guideHtml = data.HuongDan *@
+        @*         ? `<div class="alert alert-secondary text-left d-inline-block mt-3" style="max-width: 800px;"> *@
+        @*                 <h6 class="font-weight-bold text-info"><i class="fas fa-lightbulb mr-2"></i>Hướng dẫn làm bài:</h6> *@
+        @*                 <div style="white-space: pre-line;">${data.HuongDan}</div> *@
+        @*            </div>` *@
+        @*         : ''; *@
+
+        @*     let html = ` *@
+        @*         <div class="content-padding"> *@
+        @*             <div id="bt-start-${data.MaBT}" class="text-center py-5"> *@
+        @*                 <i class="fas fa-file-signature text-success mb-3" style="font-size: 60px;"></i> *@
+        @*                 <h3 class="mb-3">${data.TieuDe || 'Bài tập tự luận'}</h3> *@
+
+        @*                 <div class="mb-3"> *@
+        @*                     ${timeHtml} *@
+        @*                     <span class="badge badge-info px-3 py-2" style="font-size: 14px;"><i class="fas fa-question-circle mr-1"></i> Số câu hỏi: ${data.CauHois ? data.CauHois.length : 0}</span> *@
+        @*                 </div> *@
+
+        @*                 ${guideHtml} *@
+        @*                 <br> *@
+
+        @*                 <button class="btn btn-success btn-lg px-5 mt-4 shadow" onclick="startAssignment(${data.MaBT})"> *@
+        @*                     <i class="fas fa-play mr-2"></i> Bắt đầu làm bài *@
+        @*                 </button> *@
+        @*             </div> *@
+
+        @*             <div id="bt-content-${data.MaBT}" style="display:none;"> *@
+        @*                 <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2"> *@
+        @*                     <h4 class="m-0 text-success"><i class="fas fa-pen-fancy mr-2"></i> ${data.TieuDe || 'Bài tập'}</h4> *@
+        @*                     ${timeHtml ? `<span class="text-muted small"><i class="fas fa-clock"></i> ${data.ThoiLuong} phút</span>` : ''} *@
+        @*                 </div> *@
+        @*     `; *@
+
+        @*     // Render danh sách câu hỏi *@
+        @*     if (data.CauHois && data.CauHois.length > 0) { *@
+        @*         data.CauHois.forEach((q, index) => { *@
+        @*             let qId = q.MACAU || q.maCauHoi || q.MaCauHoi; *@
+        @*             html += ` *@
+        @*             <div class="question-card"> *@
+        @*                 <div class="question-text"><strong>Câu ${index + 1}:</strong> ${q.NoiDung}</div> *@
+        @*                 <div class="form-group"> *@
+        @*                     <textarea id="txt-bt-${qId}" class="form-control" rows="4" placeholder="Nhập câu trả lời của bạn..."></textarea> *@
+        @*                 </div> *@
+        @*                 <div class="model-answer" id="ans-${qId}" style="display:none;"> *@
+        @*                     <strong><i class="fas fa-key"></i> Đáp án tham khảo:</strong> *@
+        @*                     <div class="mt-1 text-success bg-light p-2 rounded border">${q.DapAnMau || 'Không có đáp án mẫu.'}</div> *@
+        @*                 </div> *@
+        @*             </div>`; *@
+        @*         }); *@
+
+        @*         html += ` *@
+        @*             <div class="text-center mt-4"> *@
+        @*                 <button class="btn btn-primary btn-submit-quiz px-5 py-2" onclick="submitAssignment(${data.MaBT})"> *@
+        @*                     <i class="fas fa-paper-plane mr-2"></i> Nộp bài & Xem đáp án *@
+        @*                 </button> *@
+        @*             </div>`; *@
+        @*     } else { *@
+        @*         html += `<div class="alert alert-info">Bài tập này chưa có câu hỏi nào.</div>`; *@
+        @*     } *@
+
+        @*     html += `</div></div>`; *@
+        @*     container.html(html); *@
+        @* } *@
+
+
+                        // 6. RENDER ASSIGNMENT - ĐÃ XÓA NÚT THỪA
+        function renderAssignment(data, container) {
+            let timeHtml = data.ThoiLuong && data.ThoiLuong > 0
+                ? `<span class="badge badge-warning px-3 py-2 mr-2" style="font-size: 14px;"><i class="fas fa-clock mr-1"></i> Thời lượng: ${data.ThoiLuong} phút</span>`
+                : '';
+
+            // 2. [SỬA ĐOẠN NÀY] Hiển thị Hướng dẫn (File hoặc Text)
+             let guideHtml = '';
+             if (data.HuongDan) {
+                 // Kiểm tra xem có phải là link file (bắt đầu bằng http) hay không
+                 if (data.HuongDan.trim().startsWith('http')) {
+                     guideHtml = `
+                         <div class="mt-3">
+                             <a href="${data.HuongDan}" target="_blank" class="btn btn-info shadow-sm">
+                                 <i class="fas fa-file-download mr-2"></i> Tải file hướng dẫn làm bài
+                             </a>
+                         </div>`;
+                 } else {
+                     // Nếu là văn bản bình thường
+                     guideHtml = `
+                         <div class="alert alert-secondary text-left d-inline-block mt-3" style="max-width: 800px;">
+                             <h6 class="font-weight-bold text-info"><i class="fas fa-lightbulb mr-2"></i>Hướng dẫn làm bài:</h6>
+                             <div style="white-space: pre-line;">${data.HuongDan}</div>
+                         </div>`;
+                 }
+             }
+
+            let html = `
+                <div class="content-padding">
+                    <div id="bt-start-${data.MaBT}" class="text-center py-5">
+                        <i class="fas fa-file-signature text-success mb-3" style="font-size: 60px;"></i>
+                        <h3 class="mb-3">${data.TieuDe || 'Bài tập tự luận'}</h3>
+
+                        <div class="mb-3">
+                            ${timeHtml}
+                            <span class="badge badge-info px-3 py-2" style="font-size: 14px;"><i class="fas fa-question-circle mr-1"></i> Số câu hỏi: ${data.CauHois ? data.CauHois.length : 0}</span>
+                        </div>
+
+                        ${guideHtml}
+                        <br>
+
+                        <button class="btn btn-success btn-lg px-5 mt-4 shadow" onclick="startAssignment(${data.MaBT})">
+                            <i class="fas fa-play mr-2"></i> Bắt đầu làm bài
+                        </button>
+                    </div>
+
+                    <div id="bt-content-${data.MaBT}" style="display:none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 sticky-top bg-white pt-3" style="z-index: 100;">
+                            <h4 class="m-0 text-success"><i class="fas fa-pen-fancy mr-2"></i> ${data.TieuDe || 'Bài tập'}</h4>
+
+                            <div class="d-flex align-items-center">
+                                ${data.ThoiLuong > 0 ?
+                                    `<div id="timer-box-${data.MaBT}" class="badge badge-danger p-2 px-3 mr-2" style="font-size: 16px; min-width: 100px;">
+                                        <i class="fas fa-stopwatch mr-1"></i> <span id="timer-val-${data.MaBT}">--:--</span>
+                                     </div>`
+                                : ''}
+
+                                </div>
+                        </div>
+            `;
+
+            // Render danh sách câu hỏi
+            if (data.CauHois && data.CauHois.length > 0) {
+                data.CauHois.forEach((q, index) => {
+                    let qId = q.MACAU || q.maCauHoi || q.macau;
+                    html += `
+                    <div class="question-card">
+                        <div class="question-text"><strong>Câu ${index + 1}:</strong> ${q.NoiDung}</div>
+                        <div class="form-group">
+                            <textarea id="txt-bt-${qId}" class="form-control" rows="4" placeholder="Nhập câu trả lời của bạn..."></textarea>
+                        </div>
+                        <div class="model-answer" id="ans-${qId}" style="display:none;">
+                            <strong><i class="fas fa-key"></i> Đáp án tham khảo:</strong>
+                            <div class="mt-1 text-success bg-light p-2 rounded border">${q.DapAnMau || 'Không có đáp án mẫu.'}</div>
+                        </div>
+                    </div>`;
+                });
+
+                // Nút nộp bài CHÍNH nằm ở cuối
+                html += `
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary btn-submit-quiz px-5 py-2" onclick="submitAssignment(${data.MaBT})">
+                            <i class="fas fa-paper-plane mr-2"></i> Nộp bài & Xem đáp án
+                        </button>
+                    </div>`;
+            } else {
+                html += `<div class="alert alert-info">Bài tập này chưa có câu hỏi nào.</div>`;
+            }
+
+            html += `</div></div>`;
+            container.html(html);
+        }
+
+
+                // --- HÀM BẮT ĐẦU BÀI TẬP ---
+               function startAssignment(btId) {
+            $(`#bt-start-${btId}`).slideUp();
+            $(`#bt-content-${btId}`).fadeIn();
+            $('html, body').animate({ scrollTop: 0 }, 500);
+
+            // [MỚI] Kích hoạt Timer nếu có thời lượng
+            const data = lessonData[`BT_${btId}`];
+            if (data.ThoiLuong && data.ThoiLuong > 0) {
+                runTimer(btId, data.ThoiLuong * 60); // Chuyển phút sang giây
+            }
+        }
+
+                function runTimer(btId, seconds) {
+            // Xóa timer cũ nếu đang chạy
+            if (currentTimerInterval) clearInterval(currentTimerInterval);
+
+            const display = $(`#timer-val-${btId}`);
+
+            function updateDisplay(sec) {
+                let m = Math.floor(sec / 60);
+                let s = sec % 60;
+                // Thêm số 0 đằng trước nếu < 10
+                display.text(`${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`);
+            }
+
+            updateDisplay(seconds); // Hiển thị ngay lập tức
+
+            currentTimerInterval = setInterval(() => {
+                seconds--;
+                updateDisplay(seconds);
+
+                 // Hiệu ứng nhấp nháy khi còn dưới 60s
+         if (seconds < 60) $(`#timer-box-${btId}`).addClass('blinking-alert');
+
+         // HẾT GIỜ
+         if (seconds <= 0) {
+             clearInterval(currentTimerInterval);
+
+             // 1. XỬ LÝ GIAO DIỆN NGAY LẬP TỨC (Trước khi hiện thông báo)
+
+             // a. Tắt đồng hồ đỏ/nhấp nháy -> Chuyển sang màu xám
+             $(`#timer-box-${btId}`)
+                 .removeClass('badge-danger blinking-alert') // Xóa màu đỏ và nhấp nháy
+                 .addClass('badge-secondary')               // Thêm màu xám
+                 .html('<i class="fas fa-hourglass-end"></i> Hết giờ'); // Đổi text
+
+             // b. Khóa cứng nút nộp bài và ô nhập
+             $('.btn-submit-quiz').prop('disabled', true).html('<i class="fas fa-lock"></i> Đang nộp...');
+             $('textarea').prop('disabled', true);
+
+             // 2. HIỆN THÔNG BÁO VÀ NỘP BÀI (Delay 50ms để giao diện kịp cập nhật)
+             setTimeout(function() {
+                 alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động thu bài.");
+                 submitAssignment(btId, true); // Gọi nộp bài (forceSubmit = true)
+             }, 50);
+         }
+            }, 1000);
+        }
+
+        // 7. SUBMIT ASSIGNMENT
+        @*         function submitAssignment(btId) { *@
+        @*     if(confirm('Nộp bài để xem đáp án mẫu?')) { *@
+        @*         $('.model-answer').slideDown(); *@
+        @*         $('textarea').prop('disabled', true); *@
+        @*         $('.btn-submit-quiz').prop('disabled', true).text('Đã nộp bài'); *@
+
+        @*         const data = lessonData[`BT_${btId}`]; *@
+        @*         let userAnswers = []; *@
+
+        @*         data.CauHois.forEach((q, index) => { *@
+        @*             // Sửa lỗi ở đây: *@
+        @*             // 1. Lấy đúng ID câu hỏi *@
+        @*             let idCauHoi = q.MaCauHoi || q.maCauHoi || q.MACAU || q.macau || q.MaCHBT; *@
+
+        @*             // 2. Tìm đúng textarea tương ứng với câu hỏi này *@
+        @*             let answerText = ""; *@
+
+        @*             // Cách 1: Tìm theo ID (Nếu bạn đã sửa hàm renderAssignment để thêm id="txt-bt-ID") *@
+        @*             let txtById = $(`#txt-bt-${idCauHoi}`); *@
+        @*             if (txtById.length > 0) { *@
+        @*                 answerText = txtById.val(); *@
+        @*             } else { *@
+        @*                 // Cách 2: Tìm theo thứ tự (Fallback nếu chưa sửa render) *@
+        @*                 // Tìm tất cả textarea trong vùng nội dung, lấy cái thứ 'index' *@
+        @*                 // Lưu ý: Cần chắc chắn vùng chứa chỉ có các textarea trả lời *@
+        @*                 // Sử dụng .question-card textarea để chính xác hơn *@
+        @*                 let allTextareas = $('.question-card textarea'); *@
+        @*                 if (allTextareas.length > index) { *@
+        @*                     answerText = $(allTextareas[index]).val(); *@
+        @*                 } *@
+        @*             } *@
+
+        @*             userAnswers.push({ *@
+        @*                 MaCauHoi: idCauHoi, *@
+        @*                 CauTraLoi: answerText, *@
+        @*                 IsCorrect: true *@
+        @*             }); *@
+        @*         }); *@
+
+        @*         // Debug để kiểm tra xem đã lấy đúng chưa *@
+        @*         console.log("Danh sách câu trả lời:", userAnswers); *@
+
+        @*         saveResultToServer('BT', btId, 0, data.CauHois.length, userAnswers); *@
+        @*         markComplete('BT', btId); *@
+        @*     } *@
+        @* } *@
+
+                // [SỬA] Thêm tham số forceSubmit
+        function submitAssignment(btId, forceSubmit = false) {
+
+               if ($(`.btn-submit-quiz`).prop('disabled') && !forceSubmit) {
+            return;
+        }
+
+            // Nếu hết giờ (forceSubmit=true) thì bỏ qua confirm
+            if (forceSubmit || confirm('Bạn có chắc chắn muốn nộp bài?')) {
+
+                // 1. DỪNG TIMER
+                if (currentTimerInterval) clearInterval(currentTimerInterval);
+                $(`#timer-box-${btId}`).removeClass('badge-danger').addClass('badge-secondary').html('<i class="fas fa-check"></i> Đã nộp');
+
+                // 2. UI Updates (Giữ nguyên)
+                $('.model-answer').slideDown();
+                $('textarea').prop('disabled', true);
+
+                // Disable tất cả nút nộp bài
+                $(`.btn-submit-quiz`).prop('disabled', true).text('Đã nộp bài');
+
+                // 3. Logic thu thập dữ liệu (Giữ nguyên)
+                const data = lessonData[`BT_${btId}`];
+                let userAnswers = [];
+                data.CauHois.forEach((q, index) => {
+                    let qId = q.MACAU || q.maCauHoi || q.MaCauHoi;
+                    let textArea = $(`#txt-bt-${qId}`);
+                    let answerText = textArea.length > 0 ? textArea.val() : "";
+
+                    userAnswers.push({
+                        MaCauHoi: qId,
+                        CauTraLoi: answerText,
+                        IsCorrect: true
+                    });
+                });
+
+                // 4. Lưu & Đánh dấu (Giữ nguyên)
+                saveResultToServer('BT', btId, 0, data.CauHois.length, userAnswers);
+                markComplete('BT', btId);
+            }
+        }
+
+        // 8. API: MARK COMPLETE
+        function markComplete(type, id) {
+            // Nếu là chế độ xem trước (Giảng viên) -> Chỉ update UI, không gọi API
+            if (isPreview) {
+                updateCheckUI(type, id);
+                return;
+            }
+
+            // Nếu là Học viên -> Gọi về MVC Controller
+            $.ajax({
+                url: '/KhoaHoc/MarkCompleted', // [SỬA] Gọi về MVC thay vì http://localhost:5105...
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    maHV: currentUserId,
+                    maKH: maKH,
+                    type: type,
+                    id: id
+                }),
+                success: function(res) {
+                    if(res.success) {
+                        updateCheckUI(type, id);
+                    } else {
+                        console.error("Lỗi đánh dấu hoàn thành:", res.message);
+                    }
+                },
+                error: function(err) {
+                    console.error("Lỗi Ajax:", err);
+                }
+            });
+        }
+
+        function updateCheckUI(type, id) {
+            const checkId = `#check-${type}-${id}`;
+
+            // Chỉ xử lý nếu bài này chưa được đánh dấu completed trước đó
+            if (!$(checkId).hasClass('completed')) {
+                $(checkId).addClass('completed');
+                $(checkId).find('i').show();
+
+                // Tăng biến đếm local
+                currentCompleted++;
+                $('#completed-count').text(currentCompleted);
+
+                // --- Cập nhật thanh Progress Bar ---
+                if (totalLessons > 0) {
+                    const percent = Math.round((currentCompleted / totalLessons) * 100);
+                    $('#course-progress-bar').css('width', percent + '%');
+                }
+
+                // Kiểm tra nếu đã hoàn thành 100% thì hiện màn hình chúc mừng
+                if(currentCompleted === totalLessons) {
+                    setTimeout(showCompletionScreen, 1000);
+                }
+            }
+        }
+
+        // --- NEW CODE: 9. SHOW COMPLETION SCREEN & RATING ---
+        let selectedRating = 0;
+
+        function showCompletionScreen() {
+            const html = `
+                <div class="congrats-container">
+                    <i class="fas fa-trophy trophy-icon"></i>
+                    <h2 class="font-weight-bold mb-3">Chúc mừng bạn!</h2>
+                    <p class="text-muted mb-4" style="font-size: 18px;">
+                        Bạn đã xuất sắc hoàn thành tất cả các bài học trong khóa <strong>"@Model.TenKhoaHoc"</strong>.
+                    </p>
+
+                    <div class="card p-4 shadow-sm border-0 review-box">
+                        <h5 class="mb-3">Đánh giá khóa học này</h5>
+                        <p class="small text-muted mb-0">Hãy để lại cảm nhận của bạn để giúp chúng tôi cải thiện.</p>
+
+                        <div class="star-rating" id="star-rating-box">
+                            <i class="fas fa-star" onclick="setRating(1)" onmouseover="hoverRating(1)" onmouseleave="resetHover()"></i>
+                            <i class="fas fa-star" onclick="setRating(2)" onmouseover="hoverRating(2)" onmouseleave="resetHover()"></i>
+                            <i class="fas fa-star" onclick="setRating(3)" onmouseover="hoverRating(3)" onmouseleave="resetHover()"></i>
+                            <i class="fas fa-star" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseleave="resetHover()"></i>
+                            <i class="fas fa-star" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseleave="resetHover()"></i>
+                        </div>
+
+                        <div class="form-group text-left">
+                            <label class="font-weight-bold">Bình luận của bạn:</label>
+                            <textarea id="txt-comment" class="form-control" rows="3" placeholder="Nội dung bài học có hữu ích không? Giảng viên thế nào?"></textarea>
+                        </div>
+
+                        <button class="btn btn-success btn-block py-2 font-weight-bold" onclick="submitReview()">
+                            <i class="fas fa-paper-plane mr-2"></i> Gửi đánh giá
+                        </button>
+                         <a href="@Url.Action("Index", "Home")" class="btn btn-link mt-2 text-muted">Về trang chủ</a>
+                    </div>
+                </div>
+            `;
+            $('#content-display').html(html);
+        }
+
+        function hoverRating(star) {
+            const stars = document.querySelectorAll('#star-rating-box i');
+            stars.forEach((s, index) => {
+                if (index < star) s.classList.add('hover');
+                else s.classList.remove('hover');
+            });
+        }
+
+        function resetHover() {
+            const stars = document.querySelectorAll('#star-rating-box i');
+            stars.forEach((s) => s.classList.remove('hover'));
+        }
+
+        function setRating(star) {
+            selectedRating = star;
+            const stars = document.querySelectorAll('#star-rating-box i');
+            stars.forEach((s, index) => {
+                if (index < star) s.classList.add('active');
+                else s.classList.remove('active');
+            });
+        }
+
+        @* function submitReview() { *@
+        @*     const comment = $('#txt-comment').val(); *@
+        @*     if(selectedRating === 0) { *@
+        @*         alert("Vui lòng chọn số sao bạn muốn đánh giá!"); *@
+        @*         return; *@
+        @*     } *@
+
+        @*     // Mock submission *@
+        @*     // Tại đây bạn sẽ gọi API lưu đánh giá sau này *@
+        @*     alert(`Cảm ơn bạn đã đánh giá ${selectedRating} sao!\nNội dung: ${comment}`); *@
+
+        @*     // Disable form after submit (Mock UX) *@
+        @*     $('.review-box button').prop('disabled', true).text('Đã gửi đánh giá'); *@
+        @*     $('.review-box textarea').prop('disabled', true); *@
+        @*     $('.star-rating').css('pointer-events', 'none'); *@
+        @* } *@
+
+        function submitReview() {
+            // 1. Lấy dữ liệu
+            const comment = $('#txt-comment').val();
+
+            // 2. Validate
+            if(selectedRating === 0) {
+                alert("Vui lòng chọn số sao bạn muốn đánh giá!");
+                return;
+            }
+            if (currentUserId <= 0) {
+                alert("Bạn cần đăng nhập để đánh giá.");
+                return;
+            }
+
+            // UI: Disable nút gửi để tránh bấm nhiều lần
+            const btnSubmit = $('.review-box button');
+            btnSubmit.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang gửi...');
+
+            // 3. Gọi AJAX về MVC Controller
+            $.ajax({
+                url: '/KhoaHoc/SubmitReview', // Gọi vào MVC Action vừa tạo
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    MaHV: currentUserId,
+                    MaKH: maKH,
+                    SoSao: selectedRating,
+                    NoiDung: comment
+                }),
+                success: function (res) {
+                    if (res.success) {
+                        alert("Cảm ơn bạn! Đánh giá của bạn đã được lưu.");
+
+                        // Khóa form lại sau khi thành công
+                        btnSubmit.text('Đã gửi đánh giá').removeClass('btn-success').addClass('btn-secondary');
+                        $('.review-box textarea').prop('disabled', true);
+                        $('.star-rating').css('pointer-events', 'none'); // Không cho chọn sao nữa
+                    } else {
+                        alert("Có lỗi xảy ra: " + res.message);
+                        btnSubmit.prop('disabled', false).text('Gửi đánh giá'); // Mở lại nút nếu lỗi
+                    }
+                },
+                error: function (err) {
+                    console.error(err);
+                    alert("Lỗi kết nối server.");
+                    btnSubmit.prop('disabled', false).text('Gửi đánh giá');
+                }
+            });
+        }
+
+        // 10. API: RESET PROGRESS (AUTHOR ONLY)
+        function resetProgress() {
+            if(confirm("Xóa toàn bộ lịch sử học của bạn trong khóa này để test lại?")) {
+                $.ajax({
+                    url: '@Url.Action("ResetProgress", "KhoaHoc")',
+                    type: 'POST',
+                    data: { maKH: maKH },
+                    success: function(res) {
+                        if(res.success) {
+                            alert("Đã reset thành công!");
+                            location.reload();
+                        } else {
+                            alert("Lỗi: " + res.message);
+                        }
+                    }
+                });
+            }
+        }
+
+                        function saveResultToServer(type, idRef, score, total, details) {
+            // 1. Kiểm tra total để tránh chia cho 0
+            let finalScore = 0;
+            if (type === 'TN' && total > 0) {
+                finalScore = (score / total) * 10;
+            }
+
+            // 2. Kiểm tra dữ liệu trước khi gửi (Debug)
+            console.log("Dữ liệu gửi đi:", {
+                Type: type,
+                IdRef: idRef,
+                DiemSo: finalScore,
+                SoCauDung: score,
+                TongSoCau: total,
+                ChiTiet: details
+            });
+
+            $.ajax({
+                url: '/KhoaHoc/LuuKetQua',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    Type: type,
+                    IdRef: idRef,
+                    DiemSo: finalScore, // Đảm bảo biến này là số thực, không phải NaN
+                    SoCauDung: score,
+                    TongSoCau: total,
+                    ChiTiet: details
+                }),
+                success: function(res) {
+                    console.log("Đã lưu kết quả thành công.");
+                },
+                error: function(err) {
+                    // 3. Quan trọng: In lỗi chi tiết ra để xem field nào sai
+                    console.error("Lỗi lưu kết quả:", err.responseText);
+                    alert("Lỗi khi lưu kết quả: " + err.statusText);
+                }
+            });
+        }
+
+
+            // --- HÀM LÀM LẠI BÀI TẬP TỰ LUẬN ---
+        @* function redoAssignment(btId) { *@
+        @*     if (!confirm("Làm lại bài này sẽ tính là lần nộp mới. Dữ liệu cũ vẫn được lưu trong lịch sử. Bạn có chắc không?")) return; *@
+
+        @*     // 1. Lấy dữ liệu bài tập *@
+        @*     const data = lessonData[`BT_${btId}`]; *@
+        @*     if (!data) { *@
+        @*         console.error("Không tìm thấy dữ liệu BT:", btId); *@
+        @*         return; *@
+        @*     } *@
+
+        @*     // 2. Reset từng câu hỏi *@
+        @*     data.CauHois.forEach(q => { *@
+        @*         // Lấy ID câu hỏi chuẩn (để tìm textarea) *@
+        @*         let qId = q.MACAU || q.maCauHoi || q.MaCauHoi; *@
+
+        @*         // Xóa nội dung và Mở khóa textarea *@
+        @*         $(`#txt-bt-${qId}`).val('').prop('disabled', false); *@
+
+        @*         // Ẩn đáp án mẫu *@
+        @*         $(`#ans-${qId}`).hide(); // Hoặc .slideUp() *@
+        @*         $(`.model-answer`).hide(); // Ẩn div chung nếu có *@
+        @*     }); *@
+
+        @*     // 3. Khôi phục nút "Nộp bài" *@
+        @*     // Tìm nút "Làm lại" hiện tại (đang là btn-warning) và thay thế bằng nút Nộp bài gốc *@
+        @*     // Selector này tìm nút nằm trong vùng hiển thị nội dung *@
+        @*     const redoBtn = $('#content-display button[onclick^="redoAssignment"]'); *@
+
+        @*     // Tạo lại nút Nộp bài *@
+        @*     const submitBtnHtml = ` *@
+        @*         <button class="btn btn-primary btn-submit-quiz" onclick="submitAssignment(${btId})"> *@
+        @*             Nộp bài & Xem đáp án *@
+        @*         </button>`; *@
+
+        @*     if (redoBtn.length > 0) { *@
+        @*         redoBtn.replaceWith(submitBtnHtml); *@
+        @*     } else { *@
+        @*         // Trường hợp không tìm thấy nút (fallback), tìm class btn-warning *@
+        @*         $('.btn-warning').replaceWith(submitBtnHtml); *@
+        @*     } *@
+
+        @*     // 4. Cuộn lên đầu *@
+        @*     $('html, body').animate({ *@
+        @*         scrollTop: $(".content-padding").offset().top - 50 *@
+        @*     }, 500); *@
+        @* } *@
+
+                        function redoAssignment(btId) {
+            if (!confirm("Làm lại bài này sẽ tính là lần nộp mới...")) return;
+
+            const data = lessonData[`BT_${btId}`];
+
+            // UI Reset (Giữ nguyên)
+            $(`#bt-start-${btId}`).hide();
+            $(`#bt-content-${btId}`).show();
+            data.CauHois.forEach(q => {
+                let qId = q.MACAU || q.maCauHoi || q.MaCauHoi;
+                $(`#txt-bt-${qId}`).val('').prop('disabled', false);
+                $(`#ans-${qId}`).hide();
+            });
+            $('.model-answer').hide();
+
+            // Reset nút Nộp bài (Cả nút trên và nút dưới)
+            const submitBtnHtml = `Nộp bài`; // Text ngắn cho nút trên header
+            $(`.btn-submit-quiz`).prop('disabled', false).html('<i class="fas fa-paper-plane mr-2"></i> Nộp bài');
+
+            // Tìm nút làm lại (đang là btn-warning) và thay thế sự kiện onclick
+            // Cách đơn giản nhất là xóa nút warning đi và render lại nút submit hoặc chỉ cần đổi thuộc tính
+            const warningBtn = $('#content-display .btn-warning');
+            warningBtn.removeClass('btn-warning').addClass('btn-primary')
+                      .attr('onclick', `submitAssignment(${btId})`)
+                      .html('<i class="fas fa-paper-plane mr-2"></i> Nộp bài & Xem đáp án');
+
+            $('html, body').animate({ scrollTop: 0 }, 500);
+
+               // [SỬA LỖI] KHỞI ĐỘNG LẠI ĐỒNG HỒ
+        if (data.ThoiLuong && data.ThoiLuong > 0) {
+            const timerBox = $(`#timer-box-${btId}`);
+
+            // 1. Reset màu sắc (Xóa màu xám, thêm màu đỏ)
+            timerBox.removeClass('badge-secondary').addClass('badge-danger');
+
+            // 2. [QUAN TRỌNG] Tạo lại thẻ span hiển thị giờ (Vì hàm fillAssignmentData đã lỡ xóa mất nó)
+            timerBox.html(`<i class="fas fa-stopwatch mr-1"></i> <span id="timer-val-${btId}">--:--</span>`);
+
+            // 3. Gọi hàm đếm ngược
+            runTimer(btId, data.ThoiLuong * 60);
+        }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "Thanh toán Thành công";
+    Layout = "~/Views/Shared/_HocVien_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h3 class="alert-heading">🎉 Thanh toán thành công!</h3>
+        <p>Cảm ơn bạn đã mua hàng. Hóa đơn của bạn (Mã: <strong>@ViewBag.MaHD</strong>) đã được thanh toán.</p>
+        <hr>
+        <a href="/KhoaHoc" class="btn btn-primary">Tiếp tục mua sắm</a>
+        <a href="#" class="btn btn-outline-success">Xem khóa học của tôi</a>
+    </div>
+</div>

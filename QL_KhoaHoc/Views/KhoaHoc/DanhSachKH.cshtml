@@ -1,0 +1,227 @@
+﻿@model List<QL_KhoaHoc.Models.KhoaHoc>
+@{
+    ViewData["Title"] = "Khóa học của tôi";
+    Layout = "~/Views/Shared/_GiangVien_Layout.cshtml";
+
+    // Phân loại danh sách ngay trên View
+    var dsChoDuyet = Model.Where(k => k.TrangThai == "ChoDuyet").ToList();
+    var dsDaDuyet = Model.Where(k => k.TrangThai == "DaDuyet").ToList();
+    var dsTuChoi = Model.Where(k => k.TrangThai == "TuChoi").ToList();
+}
+
+<div class="container-fluid py-4">
+    <h3 class="fw-bold mb-4 text-secondary">Quản lý khóa học</h3>
+
+    <ul class="nav nav-pills mb-4 bg-white p-2 rounded shadow-sm" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold position-relative px-4" id="tab-approved" data-bs-toggle="pill" data-bs-target="#content-approved" type="button" role="tab">
+                <i class="fas fa-check-circle text-success me-2"></i> Đã duyệt
+                <span class="badge bg-success ms-2">@dsDaDuyet.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold position-relative px-4" id="tab-pending" data-bs-toggle="pill" data-bs-target="#content-pending" type="button" role="tab">
+                <i class="fas fa-clock text-warning me-2"></i> Chờ duyệt
+                <span class="badge bg-warning text-dark ms-2">@dsChoDuyet.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold position-relative px-4" id="tab-rejected" data-bs-toggle="pill" data-bs-target="#content-rejected" type="button" role="tab">
+                <i class="fas fa-times-circle text-danger me-2"></i> Bị từ chối
+                <span class="badge bg-danger ms-2">@dsTuChoi.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+
+        <div class="tab-pane fade show active" id="content-approved" role="tabpanel">
+            @if (dsDaDuyet.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    @foreach (var item in dsDaDuyet)
+                    {
+                        // Logic kiểm tra video
+                        bool isVideo = !string.IsNullOrEmpty(item.AnhBia) &&
+                        (item.AnhBia.EndsWith(".mp4") || item.AnhBia.Contains("/video/upload/"));
+
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm border-start border-5 border-success">
+                                <div class="position-relative media-wrapper">
+                                    @if (isVideo)
+                                    {
+                                        <video src="@item.AnhBia" class="card-img-top media-content" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                                        <span class="badge bg-dark bg-opacity-75 position-absolute top-50 start-50 translate-middle pointer-events-none">
+                                            <i class="fas fa-play-circle fa-2x"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <img src="@(string.IsNullOrEmpty(item.AnhBia) ? "https://via.placeholder.com/300x200" : item.AnhBia)"
+                                             class="card-img-top media-content" alt="@item.TenKhoaHoc">
+                                    }
+                                </div>
+
+                                <div class="card-body">
+                                    <h5 class="card-title text-truncate" title="@item.TenKhoaHoc">@item.TenKhoaHoc</h5>
+                                    <p class="card-text text-muted small">Ngày đăng: @(item.NgayPhatHanh?.ToString("dd/MM/yyyy"))</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-danger fw-bold">@string.Format("{0:N0} đ", item.GiaTien)</span>
+                                        <span class="badge bg-success">Đang hoạt động</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0 text-end">
+                                    <a href="/KhoaHoc/ChiTietKH/@item.MaKhoaHoc" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Xem</a>
+                                    <a href="/KhoaHoc/TaoKhoaHoc?id=@item.MaKhoaHoc" class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i> Sửa</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">Chưa có khóa học nào được duyệt.</div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="content-pending" role="tabpanel">
+            @if (dsChoDuyet.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    @foreach (var item in dsChoDuyet)
+                    {
+                        bool isVideo = !string.IsNullOrEmpty(item.AnhBia) &&
+                        (item.AnhBia.EndsWith(".mp4") || item.AnhBia.Contains("/video/upload/"));
+
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm border-start border-5 border-warning">
+                                <div class="position-relative media-wrapper">
+                                    @if (isVideo)
+                                    {
+                                        <video src="@item.AnhBia" class="card-img-top media-content" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                                        <span class="badge bg-dark bg-opacity-75 position-absolute top-50 start-50 translate-middle pointer-events-none">
+                                            <i class="fas fa-play-circle fa-2x"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <img src="@(string.IsNullOrEmpty(item.AnhBia) ? "https://via.placeholder.com/300x200" : item.AnhBia)"
+                                             class="card-img-top media-content">
+                                    }
+                                </div>
+
+                                <div class="card-body">
+                                    <h5 class="card-title text-truncate">@item.TenKhoaHoc</h5>
+                                    <p class="card-text text-muted small">Gửi ngày: @(item.NgayTao?.ToString("dd/MM/yyyy"))</p>
+                                    <div class="alert alert-warning py-1 small">
+                                        <i class="fas fa-hourglass-half"></i> Đang chờ Admin xét duyệt
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0 text-end">
+                                    <a href="/KhoaHoc/TaoKhoaHoc?id=@item.MaKhoaHoc" class="btn btn-sm btn-outline-secondary disabled"><i class="fas fa-edit"></i> Đang khóa sửa</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">Không có khóa học nào đang chờ duyệt.</div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="content-rejected" role="tabpanel">
+            @if (dsTuChoi.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    @foreach (var item in dsTuChoi)
+                    {
+                        bool isVideo = !string.IsNullOrEmpty(item.AnhBia) &&
+                        (item.AnhBia.EndsWith(".mp4") || item.AnhBia.Contains("/video/upload/"));
+
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm border-start border-5 border-danger">
+                                <div class="position-relative media-wrapper" style="opacity: 0.7;">
+                                    @if (isVideo)
+                                    {
+                                        <video src="@item.AnhBia" class="card-img-top media-content" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                                    }
+                                    else
+                                    {
+                                        <img src="@(string.IsNullOrEmpty(item.AnhBia) ? "https://via.placeholder.com/300x200" : item.AnhBia)"
+                                             class="card-img-top media-content">
+                                    }
+                                </div>
+
+                                <div class="card-body">
+                                    <h5 class="card-title text-truncate text-secondary">@item.TenKhoaHoc</h5>
+                                    <div class="alert alert-danger py-2 small mt-2">
+                                        <strong><i class="fas fa-exclamation-triangle"></i> Lý do:</strong>
+                                        @item.LyDoTuChoi
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0 text-end">
+                                    <a href="/KhoaHoc/TaoKhoaHoc?id=@item.MaKhoaHoc" class="btn btn-sm btn-warning fw-bold">
+                                        <i class="fas fa-wrench"></i> Sửa & Gửi lại
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">Tuyệt vời! Không có khóa học nào bị từ chối.</div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* CSS cho Tab active đẹp hơn */
+    .nav-pills .nav-link {
+        color: #6c757d;
+        border-radius: 50px;
+        margin-right: 10px;
+    }
+
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.3);
+        }
+
+    #tab-approved.active {
+        background-color: #198754;
+        box-shadow: 0 4px 6px rgba(25, 135, 84, 0.3);
+    }
+
+    #tab-pending.active {
+        background-color: #ffc107;
+        color: #000;
+        box-shadow: 0 4px 6px rgba(255, 193, 7, 0.3);
+    }
+
+    #tab-rejected.active {
+        background-color: #dc3545;
+        box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
+    }
+
+    /* CSS cho Video/Ảnh đồng bộ kích thước */
+    .media-content {
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        background-color: #000;
+    }
+
+    .pointer-events-none {
+        pointer-events: none;
+    }
+</style>

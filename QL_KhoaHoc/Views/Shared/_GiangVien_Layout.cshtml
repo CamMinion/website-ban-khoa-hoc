@@ -1,0 +1,395 @@
+﻿@{
+    Layout = null;
+}
+@using System.Net.Http
+@using Newtonsoft.Json
+@using Microsoft.AspNetCore.Http
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Cổng Giảng Viên</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg: #1a1c23; /* Màu đen hiện đại hơn */
+            --primary-color: #435ebe;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f3f4f6;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* --- LOGO T&C ACADEMY (Dark Mode Version) --- */
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.1);
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: scale(0.85); /* Thu nhỏ chút để vừa sidebar */
+        }
+
+        .icon-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-bottom: 5px;
+        }
+
+        .logo-letter {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 32px;
+            line-height: 1;
+            z-index: 2;
+        }
+        
+        .t-color { color: #60a5fa; } /* Xanh sáng cho nền tối */
+        .c-color { color: #fb923c; } /* Cam sáng cho nền tối */
+        .amp-color { 
+            color: #9ca3af; 
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 20px;
+            margin: 0 2px;
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 1px solid #4b5563;
+            padding-left: 12px;
+        }
+
+        .logo-main {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            line-height: 1;
+            color: #ffffff; /* Chữ trắng */
+            letter-spacing: 1px;
+        }
+
+        .logo-sub {
+            font-family: 'Poppins', sans-serif;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #d1d5db; /* Xám nhạt */
+            margin-top: 3px;
+        }
+
+        /* SVG Curve */
+        .smile-curve {
+            position: absolute;
+            bottom: -3px;
+            left: -5%;
+            width: 110%;
+            height: 12px;
+            z-index: 1;
+        }
+        /* -------------------------------------------------- */
+
+        /* --- Sidebar Styling --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--sidebar-bg);
+            color: #fff;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-menu {
+            padding: 20px 15px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: #9ca3af;
+            padding: 12px 15px;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(67, 94, 190, 0.3);
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #6b7280;
+            margin: 20px 0 10px 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Main Content Styling --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Top Header --- */
+        .top-header {
+            height: 70px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .user-dropdown .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .user-avatar-header {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+
+        /* --- Content Body --- */
+        .content-body {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            background-color: #fff;
+            border-top: 1px solid #f3f4f6;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <a href="/" class="text-decoration-none">
+                <div class="logo-wrapper">
+                    <div class="icon-box">
+                        <span class="logo-letter t-color">T</span>
+                        <span class="amp-color">&</span>
+                        <span class="logo-letter c-color">C</span>
+                        <svg class="smile-curve" viewBox="0 0 100 25" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="grad_dark" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fb923c;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M 5 5 Q 50 22 95 5" fill="none" stroke="url(#grad_dark)" stroke-width="5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="logo-text-group">
+                        <div class="logo-main">ACADEMY</div>
+                        <div class="logo-sub">Trust & Care</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <ul class="sidebar-menu">
+            <div class="menu-header">Tổng quan</div>
+            <li>
+                <a href="/GiangVien/Dashboard" class="@(ViewContext.RouteData.Values["Action"].ToString() == "Dashboard" ? "active" : "")">
+                    <i class="fas fa-th-large"></i> Bảng điều khiển
+                </a>
+            </li>
+
+            <li>
+                <a href="/GiangVien/ThietLapHoSo" class="@(ViewContext.RouteData.Values["Action"].ToString() == "ThietLapHoSo" ? "active" : "")">
+                    <i class="fas fa-th-large"></i> Thiết lập hồ sơ
+                </a>
+            </li>
+
+            <div class="menu-header">Giảng dạy</div>
+            <li>
+                <a href="/KhoaHoc/TaoKhoaHoc" class="@(ViewContext.RouteData.Values["Action"].ToString() == "TaoKhoaHoc" ? "active" : "")">
+                    <i class="fas fa-plus-circle"></i> Tạo Khóa Học
+                </a>
+            </li>
+            <li>
+                <a href="/KhoaHoc/QuanLyBanNhap" class="@(ViewContext.RouteData.Values["Action"].ToString() == "QuanLyBanNhap" ? "active" : "")">
+                    <i class="fas fa-pencil-alt"></i> Bản Nháp
+                </a>
+            </li>
+            <li>
+                <a href="/KhoaHoc/DanhSachKH" class="@(ViewContext.RouteData.Values["Action"].ToString() == "DanhSachKH" ? "active" : "")">
+                    <i class="fas fa-layer-group"></i> Khóa Học Của Tôi
+                </a>
+            </li>
+
+            <div class="menu-header">Quản lý & Báo cáo</div>
+            <li>
+                <a href="/GiangVien/HocVien" class="@(ViewContext.RouteData.Values["Action"].ToString() == "HocVien" ? "active" : "")">
+                    <i class="fas fa-users"></i> Học Viên
+                </a>
+            </li>
+            <li>
+                <a href="/GiangVien/DanhGia" class="@(ViewContext.RouteData.Values["Action"].ToString() == "DanhGia" ? "active" : "")">
+                    <i class="fas fa-star"></i> Đánh Giá
+                </a>
+            </li>
+            <li>
+                <a href="/GiangVien/ThuNhap" class="@(ViewContext.RouteData.Values["Action"].ToString() == "ThuNhap" ? "active" : "")">
+                    <i class="fas fa-hand-holding-usd"></i> Doanh Thu
+                </a>
+            </li>
+             <li>
+                <a href="/" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Xem Trang Web
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-light d-md-none me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="m-0 fw-bold text-secondary d-none d-md-block">@ViewData["Title"]</h5>
+            </div>
+
+            <div class="d-flex align-items-center">
+                @{
+                    var maTK = Context.Session.GetInt32("MaTK");
+                    var tenDN = Context.Session.GetString("TenDN");
+                    var maGV = Context.Session.GetInt32("MaGV");
+                    var avatar = Context.Session.GetString("AnhDaiDien");
+
+                    // Logic lấy MaGV (giữ nguyên như cũ)
+                    if (maTK != null && maGV == null)
+                    {
+                        try 
+                        {
+                            using (var client = new HttpClient())
+                            {
+                                var response = client.GetAsync($"http://localhost:5105/api/GiangVien/getMaGV/{maTK}").Result;
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    var data = response.Content.ReadAsStringAsync().Result;
+                                    maGV = JsonConvert.DeserializeObject<int>(data);
+                                    Context.Session.SetInt32("MaGV", maGV.Value);
+                                }
+                            }
+                        }
+                        catch {}
+                    }
+                }
+
+                @if (!string.IsNullOrEmpty(tenDN))
+                {
+                    <div class="me-4 position-relative cursor-pointer text-secondary">
+                        <i class="far fa-bell fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.5rem;">3</span>
+                    </div>
+
+                    <div class="dropdown user-dropdown">
+                        <a href="#" class="dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="@(!string.IsNullOrEmpty(avatar) ? avatar : "https://via.placeholder.com/40")" class="user-avatar-header me-2" alt="Avatar">
+                            <div class="d-none d-sm-block text-start lh-1">
+                                <div class="small fw-bold">@tenDN</div>
+                                <div class="small text-muted" style="font-size: 11px; margin-top: 2px;">Giảng viên</div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" aria-labelledby="userDropdown" style="min-width: 200px;">
+                            <li><a class="dropdown-item rounded-2" href="/GiangVien/CaiDat"><i class="fas fa-user-cog me-2 text-muted"></i> Hồ sơ giảng viên</a></li>
+                            <li><a class="dropdown-item rounded-2" href="/GiangVien/CaiDat"><i class="fas fa-key me-2 text-muted"></i> Đổi mật khẩu</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item rounded-2 text-danger" href="/Account/Logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        </header>
+
+        <div class="content-body">
+            @RenderBody()
+        </div>
+
+        <footer class="footer">
+            &copy; @DateTime.Now.Year - <strong>T&C Academy</strong> Instructor Panel.
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
